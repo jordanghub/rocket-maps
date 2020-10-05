@@ -1,0 +1,9 @@
+{
+  "MAP_FOLDER_DOESNT_EXIST": "Le dossier des maps n'existe pas",
+  "GAME_FOLDER_DOESNT_EXIST": "Le dossier du jeu n'existe pas",
+  "GAME_MAP_FOLDER_DOESNT_EXIST": "Le dossier du jeu contenant les maps n'existe pas",
+  "MAP_DOESNT_EXIST": "La map sélectionnée n'existe pas",
+  "MAP_CHANGE_STARTED": "Changement de map en cours",
+  "MAP_CHANGE_ERROR": "Le changement de map a échoué",
+  "MAP_CHANGE_SUCCESS": "La map a été remplacée avec succès"
+}
