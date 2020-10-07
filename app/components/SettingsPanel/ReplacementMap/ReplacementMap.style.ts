@@ -15,3 +15,5 @@ export const MapInput = styled.input`
 export const CheckBoxInput = styled.input`
   width: 100%;
 `;
+
+export const ResetButton = styled.div``;

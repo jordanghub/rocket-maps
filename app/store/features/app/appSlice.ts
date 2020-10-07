@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { DEFAULT_MAP_REPLACEMENT_NAME } from 'constants/path';
+import { getMessages } from 'appConst/messages/index';
+import { DEFAULT_MAP_REPLACEMENT_NAME } from 'appConst/path';
 import { changeSettingsKey } from '../../../utils/changeSettingsKey';
 import { IAppState } from '../interface';
 
@@ -12,6 +13,12 @@ const initialState: IAppState = {
   flashMessages: [],
   searchValue: '',
   replacementMapName: DEFAULT_MAP_REPLACEMENT_NAME,
+  locale: 'en',
+  messages: getMessages('en'),
+  localeList: [
+    { flagCode: 'us', localeCode: 'en' },
+    { flagCode: 'fr', localeCode: 'fr' },
+  ],
 };
 
 const app = createSlice({
@@ -70,6 +77,18 @@ const app = createSlice({
       }
       state.replacementMapName = action.payload.name;
     },
+
+    changeCurrentLocaleAction: (state, action) => {
+      if (!action.payload.init) {
+        changeSettingsKey('locale', action.payload.locale);
+      }
+
+      state.locale = action.payload.locale;
+    },
+
+    changeMessagesAction: (state, action) => {
+      state.messages = action.payload.messages;
+    },
   },
 });
 
@@ -86,4 +105,6 @@ export const {
   clearFlashMessagesAction,
   changeSearchValueAction,
   changeReplacementMapNameAction,
+  changeCurrentLocaleAction,
+  changeMessagesAction,
 } = app.actions;

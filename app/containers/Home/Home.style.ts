@@ -1,21 +1,23 @@
 import styled from 'styled-components';
-import { getAssetPath } from 'constants/path';
+import { getAssetPath } from 'appConst/path';
 
 export const Wrapper = styled.div`
+  padding: 0 1rem;
   min-height: 100vh;
-  background-size: 100% 100%;
-  background-image: url(${getAssetPath('images', 'bg.jpg')});
-  background-attachment: fixed;
+  /* background-size: 100% 100%; */
+  /* background-image: url(${getAssetPath('images', 'bg.jpg')}); */
+  /* background-attachment: fixed; */
   position: relative;
+  background-attachment: fixed;
+  background: rgb(80, 80, 80);
+  background: radial-gradient(
+    circle,
+    rgba(80, 80, 80, 1) 0%,
+    rgba(57, 57, 64, 1) 100%
+  );
 
-  &::before {
-    content: '';
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.5);
+  & > * {
+    position: relative;
   }
 `;
 
@@ -25,8 +27,12 @@ export const SettingsButton = styled.div`
   text-align: right;
   padding: 1rem;
 
-  &:hover {
+  & span:hover {
     cursor: pointer;
     color: rgba(255, 255, 255, 0.8);
   }
+`;
+
+export const InfoMessage = styled.p`
+  text-align: center;
 `;

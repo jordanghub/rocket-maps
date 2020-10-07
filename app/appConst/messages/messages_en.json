@@ -1,0 +1,26 @@
+{
+  "MAP_FOLDER_DOESNT_EXIST": "Map folder doesn't exists",
+  "GAME_FOLDER_DOESNT_EXIST": "Game folder doesn't exists",
+  "GAME_MAP_FOLDER_DOESNT_EXIST": "",
+  "MAP_DOESNT_EXIST": "The map you selected doesn't exists",
+  "MAP_CHANGE_STARTED": "Map change in progress",
+  "MAP_CHANGE_ERROR": "The map change failed",
+  "MAP_CHANGE_SUCCESS": "The map has been changed successfully",
+  "MAP_PATH_LABEL": "Path to the maps folder",
+  "GAME_PATH_LABEL": "Path to the game folder",
+  "CHANGE_GAME_PATH_LABEL": "Change game path",
+  "CHANGE_MAP_PATH_LABEL": "Change map path",
+  "REPLACEMENT_MAP_LABEL": "Replacement map filename",
+  "RESET_REPLACEMENT_MAP_LABEL": "Reset",
+  "MAP_LIST_TITLE": "Map list",
+  "SEARCH_PLACEHOLDER": "Search",
+  "NO_MAP_PREVIEW_LABEL": "No preview",
+
+  "OPEN_SETTINGS_LABEL": "Open settings",
+  "SETTINGS_PANEL_TITLE": "Settings",
+  "NO_PATH_DETECTED": "No path detected",
+  "NO_SEARCH_RESULT": "No search result",
+  "NO_MAPS": "No maps detected",
+  "WORKSHOP_LINK_LABEL": "Workshop",
+  "WORSKHOP_DOWNLOAD_LINK_LABEL": "Map download"
+}

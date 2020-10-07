@@ -1,20 +1,20 @@
+import { TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 
-export const MapContainer = styled.div`
+export const MapContainer = styled(TransitionGroup)`
   display: flex;
   justify-content: center;
-  flex-wrap:wrap;
+  flex-wrap: wrap;
   max-width: 1000px;
   margin: auto;
-`
+`;
 export const Wrapper = styled.div`
-  
   position: relative;
   padding: 1rem;
-  
+
   color: white;
 
   & h2 {
-    text-align:center;
+    text-align: center;
   }
-`
+`;

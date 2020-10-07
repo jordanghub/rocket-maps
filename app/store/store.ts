@@ -9,12 +9,16 @@ import { ThunkAction } from 'redux-thunk';
 // eslint-disable-next-line import/no-cycle
 import createRootReducer from './rootReducer';
 import {
+  changeCurrentLocaleAction,
   changeMapFolderAction,
+  changeMessagesAction,
   changeReplacementMapNameAction,
   changeRocketPathAction,
   changeSelectedMapAction,
 } from './features';
-import { SETTINGS_PATH } from '../constants/path';
+import { SETTINGS_PATH } from '../appConst/path';
+
+import { getMessages } from 'appConst/messages/index';
 
 export const history = createHashHistory();
 const rootReducer = createRootReducer(history);
@@ -84,6 +88,12 @@ export const configuredStore = (initialState?: RootState) => {
             init: true,
           })
         );
+      }
+      if (settings.locale) {
+        const newMessages = getMessages(settings.locale);
+
+        store.dispatch(changeCurrentLocaleAction({ locale: settings.locale }));
+        store.dispatch(changeMessagesAction({ messages: newMessages }));
       }
     }
   } catch (err) {}

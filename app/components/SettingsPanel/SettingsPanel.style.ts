@@ -1,7 +1,11 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-export const Wrapper = styled.div`
-  z-index:999;
+interface IWrapperProps {
+  animationState: string;
+}
+
+export const Wrapper = styled.div<IWrapperProps>`
+  z-index: 999;
 
   min-width: 300px;
   height: 100vh;
@@ -10,7 +14,7 @@ export const Wrapper = styled.div`
   position: fixed;
   right: 0;
   top: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0, 0, 0, 0.9);
   padding: 1rem;
 
   display: flex;
@@ -20,15 +24,21 @@ export const Wrapper = styled.div`
   & h3 {
     text-align: center;
   }
-`
 
-export const Actions = styled.div`
+  transform: translateX(100%);
 
+  transition: transform 300ms;
 
-`
+  ${(props) =>
+    props.animationState === 'entered' &&
+    css`
+      transform: translateX(0);
+    `}
+`;
+
+export const Actions = styled.div``;
 
 export const Button = styled.div`
-
   padding: 1rem;
   background: white;
   border-radius: 5px;
@@ -40,5 +50,4 @@ export const Button = styled.div`
   &:hover {
     cursor: pointer;
   }
-
-`
+`;

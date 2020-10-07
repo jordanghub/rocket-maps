@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { DATA_PATH, SETTINGS_PATH } from '../constants/path';
+import { DATA_PATH, SETTINGS_PATH } from '../appConst/path';
 
 export const dataPathExists = () => {
   if (fs.existsSync(DATA_PATH)) {
