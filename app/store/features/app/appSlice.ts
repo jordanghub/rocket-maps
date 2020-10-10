@@ -19,6 +19,8 @@ const initialState: IAppState = {
     { flagCode: 'us', localeCode: 'en' },
     { flagCode: 'fr', localeCode: 'fr' },
   ],
+  favoriteMapList: [],
+  isNewMapModalOpened: false,
 };
 
 const app = createSlice({
@@ -89,6 +91,30 @@ const app = createSlice({
     changeMessagesAction: (state, action) => {
       state.messages = action.payload.messages;
     },
+
+    addToFavoriteAction: (state, action) => {
+      changeSettingsKey('favoriteList', [
+        ...state.favoriteMapList,
+        action.payload.mapId,
+      ]);
+      state.favoriteMapList.push(action.payload.mapId);
+    },
+    removeFromFavoriteAction: (state, action) => {
+      changeSettingsKey('favoriteList', [
+        state.favoriteMapList.filter((m) => m !== action.payload.mapId),
+      ]);
+      state.favoriteMapList = state.favoriteMapList.filter(
+        (m) => m !== action.payload.mapId
+      );
+    },
+
+    changeFavoriteMapListAction: (state, action) => {
+      state.favoriteMapList = action.payload.favoriteMapList;
+    },
+
+    changeIsNewMapModalOpenAction: (state, action) => {
+      state.isNewMapModalOpened = action.payload.status;
+    },
   },
 });
 
@@ -107,4 +133,8 @@ export const {
   changeReplacementMapNameAction,
   changeCurrentLocaleAction,
   changeMessagesAction,
+  addToFavoriteAction,
+  changeFavoriteMapListAction,
+  removeFromFavoriteAction,
+  changeIsNewMapModalOpenAction,
 } = app.actions;

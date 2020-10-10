@@ -13,7 +13,6 @@ export const UsefulLinks = memo(() => {
       <p>
         <a
           href="https://steamworkshopdownloader.io/"
-          target="_blank"
           onClick={(evt: MouseEvent<HTMLAnchorElement>) => {
             evt.preventDefault();
             shell.openExternal('https://steamworkshopdownloader.io/');
@@ -25,7 +24,6 @@ export const UsefulLinks = memo(() => {
       <p>
         <a
           href="https://steamcommunity.com/app/252950/workshop/"
-          target="_blank"
           onClick={(evt: MouseEvent<HTMLAnchorElement>) => {
             evt.preventDefault();
             shell.openExternal(

@@ -1,30 +1,47 @@
 import { MapItem } from 'components';
 import { useTranslation } from 'hooks/useTranslation';
-import React, { memo } from 'react';
-import { TransitionGroup } from 'react-transition-group';
+import React, { memo, useMemo } from 'react';
 
 import { IMapContainerProps } from './interface';
 
 import * as Styled from './MapContainer.style';
 
 export const MapContainer = memo(
-  ({ mapList, mapFolder, selectedMap, handleMapClick }: IMapContainerProps) => {
+  ({
+    filteredMapList,
+    mapFolder,
+    selectedMap,
+    handleMapClick,
+    toggleMapFavoriteAction,
+    favoriteMapList,
+    changeMapName,
+  }: IMapContainerProps) => {
     const { translate } = useTranslation();
+
+    const flipKey = useMemo(
+      () => filteredMapList.map((it) => it.id).join('-'),
+      [filteredMapList]
+    );
 
     return (
       <Styled.Wrapper>
         <h2>{translate('MAP_LIST_TITLE')}</h2>
-        <Styled.MapContainer>
-          {mapList.map((map, index) => (
+
+        <Styled.MapContainer flipKey={flipKey} spring="veryGentle">
+          {filteredMapList.map((item) => (
             <MapItem
-              isVisible={map.isVisible}
-              name={map.name}
-              key={index}
-              thumbnail={map.isPreviewFileAvailable}
+              key={item.id}
+              id={item.id}
+              toggleMapFavoriteAction={toggleMapFavoriteAction}
+              isVisible={item.isVisible}
+              name={item.name}
+              thumbnail={item.isPreviewFileAvailable}
               mapFolder={mapFolder}
-              selected={map.name === selectedMap}
+              selected={item.name === selectedMap}
               noPreviewLabel={translate('NO_MAP_PREVIEW_LABEL')}
               handleMapClick={handleMapClick}
+              isFavorite={favoriteMapList.includes(item.id)}
+              changeMapName={changeMapName}
             />
           ))}
         </Styled.MapContainer>

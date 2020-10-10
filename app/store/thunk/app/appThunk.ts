@@ -1,39 +1,104 @@
-import fs from 'fs';
-import { readdirSync } from 'fs';
+/* eslint-disable consistent-return */
+import fs, { readdirSync } from 'fs';
 import path from 'path';
+
 import {
   addFlashMessageAction,
   changeMapListAction,
   changeSelectedMapAction,
   changeCurrentLocaleAction,
   changeMessagesAction,
+  addToFavoriteAction,
+  removeFromFavoriteAction,
 } from 'store/features';
 import chokidar from 'chokidar';
+
+import extractZip from 'extract-zip';
+
+import { v4 as uuid } from 'uuid';
 
 import { IState } from 'store/features/interface';
 import { DEFAULT_MAP_REPLACEMENT_NAME, GAME_MAP_FOLDER } from 'appConst/path';
 import { getMessages } from 'appConst/messages/index';
-import { filterNumberDesc } from 'utils/arraySort/sortByDate';
+import { createAsyncThunk } from '@reduxjs/toolkit/';
+import { AppDispatch } from 'index';
+import debounce from 'lodash.debounce';
 
-export const initMapWatchAction = () => async (
-  dispatch: any,
-  getState: () => IState
-) => {
-  const mapFolderPath = getState().app.mapFolder;
+interface IChangeFavoriteList {
+  isFavorite: boolean;
+  mapId: string;
+}
 
-  if (mapFolderPath && mapFolderPath === '') {
+interface IChangeMapName {
+  newMapName: string;
+  mapId: string;
+}
+
+export const toggleFavoriteAction = ({
+  isFavorite,
+  mapId,
+}: IChangeFavoriteList) => async (dispatch: any) => {
+  if (!isFavorite) {
+    dispatch(addToFavoriteAction({ mapId }));
+    return;
+  }
+  dispatch(removeFromFavoriteAction({ mapId }));
+};
+
+export const changeMapNameAction = ({
+  newMapName,
+  mapId,
+}: IChangeMapName) => async (dispatch: any, getState: () => IState) => {
+  const { mapList, mapFolder } = getState().app;
+
+  if (newMapName.trim() === '') {
+    // Le nom est vide
+    dispatch(
+      addFlashMessageAction({
+        message: 'Le nom de la map ne peut pas être vide',
+        config: {
+          type: 'error',
+        },
+      })
+    );
     return;
   }
 
-  const watcher = chokidar.watch(mapFolderPath, {
-    ignoreInitial: true,
-  });
+  const mapToChange = mapList.find((map) => map.id === mapId);
 
-  watcher.on('all', () => {
-    dispatch(fetchMapListAction());
-  });
+  if (!mapToChange || !fs.existsSync(path.join(mapFolder, mapToChange.name))) {
+    dispatch(
+      addFlashMessageAction({
+        message: "La map n'existe pas",
+        config: {
+          type: 'error',
+        },
+      })
+    );
+    return;
+  }
 
-  dispatch(fetchMapListAction());
+  if (fs.existsSync(path.join(mapFolder, newMapName))) {
+    dispatch(
+      addFlashMessageAction({
+        message: 'Une map existe déjà avec ce nom',
+        config: {
+          type: 'error',
+        },
+      })
+    );
+    // La avec ce nom existe déjà
+
+    return;
+  }
+
+  try {
+    fs.renameSync(
+      path.join(mapFolder, mapToChange.name),
+      path.join(mapFolder, newMapName)
+    );
+    // eslint-disable-next-line no-empty
+  } catch (err) {}
 };
 
 export const selectMapAction = ({ name }: any) => async (
@@ -97,8 +162,9 @@ export const selectMapAction = ({ name }: any) => async (
 
   const fileList = fs.readdirSync(selectedMapFolder);
 
-  let file = fileList.find(
-    (file) => path.extname(file) === '.upk' || path.extname(file) === '.udk'
+  const file = fileList.find(
+    (fileName) =>
+      path.extname(fileName) === '.upk' || path.extname(fileName) === '.udk'
   );
 
   if (!file) {
@@ -192,6 +258,37 @@ export const fetchMapListAction = () => async (
       // On récupère la liste des fichiers dans le dossier
       const fileList = readdirSync(path.join(mapFolderPath, name));
 
+      // Vérification du fichier map-data.json
+
+      const doesSettingsFileExists = fileList.find(
+        (fileName) => fileName === 'map-data.json'
+      );
+
+      let mapId = '';
+      // Si il n'existe pas il faut le créer et y ajouter un id
+
+      if (!doesSettingsFileExists) {
+        const generatedId = uuid();
+
+        const mapData = {
+          id: generatedId,
+        };
+        mapId = generatedId;
+
+        fs.writeFileSync(
+          path.join(mapFolderPath, name, 'map-data.json'),
+          JSON.stringify(mapData)
+        );
+      } else {
+        const file = fs.readFileSync(
+          path.join(mapFolderPath, name, 'map-data.json')
+        );
+
+        const mapData = JSON.parse(file.toString());
+
+        mapId = mapData.id;
+      }
+
       // Vérification de la présence d'un fichier preview
 
       const previewFileAvailable =
@@ -215,6 +312,7 @@ export const fetchMapListAction = () => async (
 
       if (files.length > 0) {
         return {
+          id: mapId,
           name,
           isPreviewFileAvailable: previewFileAvailable,
           mapFileName: files[0],
@@ -232,16 +330,7 @@ export const fetchMapListAction = () => async (
 
     dispatch(
       changeMapListAction({
-        list: filteredMapList
-          .filter((map: any) => map !== false)
-          .sort((a, b) =>
-            filterNumberDesc(
-              // @ts-ignore
-              new Date(a.createdAt).getTime(),
-              // @ts-ignore
-              new Date(b.createdAt).getTime()
-            )
-          ),
+        list: filteredMapList.filter((map) => map !== false),
       })
     );
   } catch (err) {
@@ -249,10 +338,10 @@ export const fetchMapListAction = () => async (
   }
 };
 export const changeLocaleAction = ({ localeCode }: any) => async (
-  dispatch: any,
+  dispatch: AppDispatch,
   getState: () => IState
 ) => {
-  const { locale, localeList } = getState().app;
+  const { locale } = getState().app;
 
   // Ne pas changer la langue si c'est la même
   if (locale === localeCode) {
@@ -263,4 +352,73 @@ export const changeLocaleAction = ({ localeCode }: any) => async (
 
   dispatch(changeCurrentLocaleAction({ locale: localeCode }));
   dispatch(changeMessagesAction({ messages: newMessages }));
+};
+
+export const addNewMapAction = createAsyncThunk(
+  'app/addNewMapAsyncStatus',
+  async ({ mapName, archivePath }: any, thunkApi) => {
+    const { mapFolder } = (thunkApi.getState() as IState).app;
+
+    //  Pas de dossier contenant les maps
+    if (mapFolder === '' || !fs.existsSync(mapFolder)) {
+      return;
+    }
+    try {
+      if (fs.existsSync(path.join(mapFolder, mapName))) {
+        // Une map existe déjà avec ce nom , cancel l'ajout
+        return {
+          mapName: 'Il y a déjà une map portant ce nom',
+        };
+      }
+
+      if (!fs.existsSync(archivePath)) {
+        // L'archive n'existe pas
+        return {
+          archivePath: "L'archive n'existe pas",
+        };
+      }
+
+      await extractZip(archivePath, {
+        dir: path.join(mapFolder, mapName),
+      });
+
+      thunkApi.dispatch(
+        addFlashMessageAction({
+          message: 'Map ajoutée avec succès',
+          config: {
+            type: 'success',
+          },
+        })
+      );
+
+      return true;
+
+      // dispatch flash message, ajouté avec success ou quelque chose comme ça
+      // eslint-disable-next-line no-empty
+    } catch (err) {}
+  }
+);
+export const initMapWatchAction = () => async (
+  dispatch: any,
+  getState: () => IState
+) => {
+  const mapFolderPath = getState().app.mapFolder;
+
+  if (mapFolderPath && mapFolderPath === '') {
+    return;
+  }
+
+  const watcher = chokidar.watch(mapFolderPath, {
+    ignoreInitial: true,
+  });
+
+  const watcherEvent = debounce((name: string) => {
+    if (name !== 'change') {
+      dispatch(fetchMapListAction());
+    }
+  }, 100);
+
+  watcher.on('all', watcherEvent);
+
+  dispatch(fetchMapListAction());
 };

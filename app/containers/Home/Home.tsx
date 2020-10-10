@@ -1,108 +1,108 @@
-import React, { memo, useCallback, useEffect, useState } from 'react';
-import { batch, useDispatch, useSelector } from 'react-redux';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { ToastContainer, toast } from 'react-toastify';
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import '!style-loader!css-loader!react-toastify/dist/ReactToastify.css';
 
 import {
-  changeRocketPathAction,
-  changeMapFolderAction,
   openSettingsPanelAction,
-  closeSettingsPanelAction,
   clearFlashMessagesAction,
   changeSearchValueAction,
-  changeReplacementMapNameAction,
-} from '../../store/features';
+  changeIsNewMapModalOpenAction,
+} from 'store/features';
 
 import {
-  changeLocaleAction,
+  changeMapNameAction,
   initMapWatchAction,
   selectMapAction,
+  toggleFavoriteAction,
 } from 'store/thunk';
 
 import { IState } from 'store/features/interface';
 
-import * as Styled from './Home.style';
 import { MapContainer } from 'containers/MapContainer/MapContainer';
-import { SettingsPanel } from 'components/SettingsPanel/SettingsPanel';
+import { SettingsPanel } from 'containers/SettingsPanel/SettingsPanel';
 import { Search } from 'components/Search/Search';
-import { searchByName } from 'utils/filters/filterMaps';
-import { IMapData } from 'types';
-import { DEFAULT_MAP_REPLACEMENT_NAME } from 'appConst/path';
 import { useTranslation } from 'hooks/useTranslation';
 
-import debounce from 'lodash.debounce';
-import { UsefulLinks } from './UsefulLinks/UsefulLinks';
 import Icon from 'components/Utils/Icon/Icon';
-import {
-  sortAlphabetically,
-  sortAlphabeticallyReverse,
-} from 'utils/arraySort/sortAlphabetically';
-import { sortByDateAsc, sortByDateDesc } from 'utils/arraySort/sortByDate';
-import {
-  ISortMethod,
-  ISortMethods,
-  ISortMethodName,
-} from 'types/arraySort/interface';
 
-const sortMethods: ISortMethods = {
-  sortAsc: {
-    name: 'sortAsc',
-    method: sortAlphabetically('name'),
-  },
-  sortDesc: {
-    name: 'sortDesc',
-    method: sortAlphabeticallyReverse('name'),
-  },
-  sortByDateAsc: {
-    name: 'sortByDateAsc',
-    method: sortByDateAsc,
-  },
-  sortByDateDesc: {
-    name: 'sortByDateDesc',
-    method: sortByDateDesc,
-  },
-};
+import { ISortMethod, ISortMethodName } from 'types/arraySort/interface';
+import {
+  IFilterMethod,
+  IFilterMethodName,
+} from 'types/arrayFilter/arrayFilter';
+
+import { AddMapFrom } from 'components/AddMapForm';
+import { filterMethods, handleMapFilter, sortMethods } from './sortMaps';
+import * as Styled from './Home.style';
+import { UsefulLinks } from './UsefulLinks/UsefulLinks';
 
 export const Home = memo(() => {
   const {
-    rocketPath,
     mapList,
     mapFolder,
-    isSettingsOpen,
     selectedMap,
     flashMessages,
     searchValue,
-    replacementMapName,
-    localeList,
-    locale,
+    favoriteMapList,
+    isNewMapModalOpened,
   } = useSelector((state: IState) => state.app);
 
-  const [filteredMaps, changeFilteredMaps] = useState<IMapData[]>(mapList);
-
-  const [selectedFilter, changeSelectedFilter] = useState<ISortMethod>(
+  const [selectedSortMethod, changeSelectedSortMethod] = useState<ISortMethod>(
     sortMethods.sortAsc
   );
+
+  const [selectedFilterMethod, changeSelectedFilterMethod] = useState<
+    IFilterMethod
+  >(filterMethods.showAll);
 
   const dispatch = useDispatch();
 
   const { translate } = useTranslation();
 
-  const debounceLog = useCallback(
-    debounce(
-      (maps, searchValue: string) =>
-        changeFilteredMaps(searchByName(maps, searchValue)),
-      300
-    ),
-    []
+  const changeMapName = useCallback(
+    (payload) => {
+      dispatch(changeMapNameAction(payload));
+    },
+    [dispatch]
+  );
+
+  const handleFilterMethodChange = useCallback(
+    (name: IFilterMethodName) => {
+      if (selectedFilterMethod.name === name) {
+        return;
+      }
+
+      changeSelectedFilterMethod(filterMethods[name]);
+    },
+    [selectedFilterMethod]
+  );
+
+  const handleSortButtonClick = useCallback(
+    (sortMethodName: ISortMethodName) => {
+      if (sortMethodName === selectedSortMethod.name) {
+        return;
+      }
+
+      changeSelectedSortMethod(sortMethods[sortMethodName]);
+    },
+    [selectedSortMethod]
+  );
+
+  const changeIsNewMapModalOpen = useCallback(
+    (payload) => {
+      dispatch(changeIsNewMapModalOpenAction(payload));
+    },
+    [dispatch]
   );
 
   const changeSearchValue = useCallback(
     (payload: any) => {
-      debounceLog(mapList, payload.searchValue);
       dispatch(changeSearchValueAction(payload));
     },
-    [dispatch, debounceLog, mapList]
+    [dispatch]
   );
 
   const openSettingsPanel = useCallback(
@@ -113,70 +113,20 @@ export const Home = memo(() => {
     (payload) => dispatch(selectMapAction(payload)),
     [dispatch]
   );
-  const closeSettingsPanel = useCallback(
-    () => dispatch(closeSettingsPanelAction()),
-    [dispatch]
-  );
-  const changeRocketPath = useCallback(
-    (payload) => dispatch(changeRocketPathAction(payload)),
-    [dispatch]
-  );
-
-  const changeMapFolder = useCallback(
-    (payload) => dispatch(changeMapFolderAction(payload)),
-    [dispatch]
-  );
 
   const clearFlashMessages = useCallback(
     () => dispatch(clearFlashMessagesAction()),
     [dispatch]
   );
 
-  const changeCurrentLocale = useCallback(
-    (payload) => dispatch(changeLocaleAction(payload)),
+  const toggleMapFavoriteAction = useCallback(
+    (payload) => dispatch(toggleFavoriteAction(payload)),
     [dispatch]
   );
-
-  const handleChangeMapName = useCallback(
-    (name: string) => dispatch(changeReplacementMapNameAction({ name })),
-    [dispatch]
-  );
-
-  const resetReplacementMapName = useCallback(
-    () => dispatch(handleChangeMapName(DEFAULT_MAP_REPLACEMENT_NAME)),
-    [dispatch, handleChangeMapName]
-  );
-
-  const handleSortButtonClick = useCallback(
-    (sortMethodName: ISortMethodName) => {
-      if (sortMethodName === selectedFilter.name) {
-        return;
-      }
-      const sortMethod = sortMethods[sortMethodName];
-
-      if (!sortMethod) {
-        return;
-      }
-
-      changeSelectedFilter(sortMethod);
-    },
-    [selectedFilter]
-  );
-
-  useEffect(() => {
-    const newFilteredMaps = [...filteredMaps];
-    newFilteredMaps.sort(selectedFilter.method);
-
-    changeFilteredMaps(newFilteredMaps);
-  }, [selectedFilter, mapList, searchValue]);
 
   const initMapWatch = useCallback(() => dispatch(initMapWatchAction()), [
     dispatch,
   ]);
-
-  useEffect(() => {
-    changeFilteredMaps(searchByName(mapList, searchValue));
-  }, [mapList]);
 
   useEffect(() => {
     initMapWatch();
@@ -192,58 +142,86 @@ export const Home = memo(() => {
     });
   }, [flashMessages, clearFlashMessages]);
 
+  const filteredMapList = useMemo(() => {
+    return handleMapFilter({
+      mapList,
+      favoriteMapList,
+      searchValue,
+      selectedFilterMethod,
+      selectedSortMethod,
+    });
+  }, [
+    mapList,
+    searchValue,
+    selectedSortMethod,
+    selectedFilterMethod,
+    favoriteMapList,
+  ]);
+
   return (
     <Styled.Wrapper>
       <ToastContainer position="bottom-center" />
       <Styled.SettingsButton>
-        <span onClick={openSettingsPanel} role="button" title="open menu">
+        <span
+          tabIndex={0}
+          onClick={openSettingsPanel}
+          role="button"
+          title="open menu"
+        >
           <Icon name="cogs" size="40" />
         </span>
       </Styled.SettingsButton>
 
+      <AddMapFrom
+        handleClose={() => changeIsNewMapModalOpen({ status: false })}
+        isOpened={isNewMapModalOpened}
+      />
       <UsefulLinks />
 
-      <SettingsPanel
-        isVisible={isSettingsOpen}
-        handleClose={closeSettingsPanel}
-        rocketPath={rocketPath}
-        mapPath={mapFolder}
-        handleRocketPathChange={changeRocketPath}
-        handleMapPathChange={changeMapFolder}
-        mapName={replacementMapName}
-        handleReplacementMapChange={handleChangeMapName}
-        resetReplacementMapName={resetReplacementMapName}
-        handleLocaleChange={changeCurrentLocale}
-        localeList={localeList}
-        selectedLocale={locale}
-      />
+      <SettingsPanel />
 
       <Search
         placeholder={translate('SEARCH_PLACEHOLDER')}
         searchValue={searchValue}
         handleChange={changeSearchValue}
         handleSortButtonClick={handleSortButtonClick}
-        selectedSortMethod={selectedFilter.name}
+        selectedSortMethod={selectedSortMethod.name}
+        selectedFilterMethod={selectedFilterMethod.name}
+        handleFilterButtonClick={handleFilterMethodChange}
       />
 
-      {filteredMaps.length > 0 && (
+      <Styled.ActionsSidebar>
+        <button
+          type="button"
+          onClick={() => changeIsNewMapModalOpen({ status: true })}
+        >
+          Ajouter une map
+        </button>
+      </Styled.ActionsSidebar>
+
+      {filteredMapList && (
         <MapContainer
-          mapList={filteredMaps}
+          flipKey={selectedSortMethod.name}
+          toggleMapFavoriteAction={toggleMapFavoriteAction}
+          filteredMapList={filteredMapList}
+          mapList={mapList}
           mapFolder={mapFolder}
           selectedMap={selectedMap}
+          favoriteMapList={favoriteMapList}
           handleMapClick={onMapClick}
+          changeMapName={changeMapName}
         />
       )}
 
-      {filteredMaps.length > 0 &&
-        filteredMaps.every((map) => !map.isVisible) &&
+      {mapList.length > 0 &&
+        filteredMapList.length === 0 &&
         searchValue !== '' && (
           <Styled.InfoMessage>
             {translate('NO_SEARCH_RESULT')}
           </Styled.InfoMessage>
         )}
 
-      {filteredMaps.length === 0 && searchValue === '' && (
+      {mapList.length === 0 && (
         <Styled.InfoMessage>{translate('NO_MAPS')}</Styled.InfoMessage>
       )}
     </Styled.Wrapper>

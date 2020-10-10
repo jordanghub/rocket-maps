@@ -1,15 +1,16 @@
-import { remote } from 'electron';
 import { existsSync, readFileSync } from 'fs';
 
 import { configureStore, getDefaultMiddleware, Action } from '@reduxjs/toolkit';
 import { createHashHistory } from 'history';
-import { routerMiddleware } from 'connected-react-router';
 import { createLogger } from 'redux-logger';
 import { ThunkAction } from 'redux-thunk';
 // eslint-disable-next-line import/no-cycle
+import { getMessages } from 'appConst/messages/index';
+
 import createRootReducer from './rootReducer';
 import {
   changeCurrentLocaleAction,
+  changeFavoriteMapListAction,
   changeMapFolderAction,
   changeMessagesAction,
   changeReplacementMapNameAction,
@@ -18,14 +19,17 @@ import {
 } from './features';
 import { SETTINGS_PATH } from '../appConst/path';
 
-import { getMessages } from 'appConst/messages/index';
-
 export const history = createHashHistory();
 const rootReducer = createRootReducer(history);
+
 export type RootState = ReturnType<typeof rootReducer>;
 
-const router = routerMiddleware(history);
-const middleware = [...getDefaultMiddleware(), router];
+// const router = routerMiddleware(history);
+const middleware = [
+  ...getDefaultMiddleware({
+    thunk: true,
+  }),
+];
 
 const excludeLoggerEnvs = ['test', 'production'];
 const shouldIncludeLogger = !excludeLoggerEnvs.includes(
@@ -41,9 +45,8 @@ if (shouldIncludeLogger) {
 }
 
 export const configuredStore = (initialState?: RootState) => {
-  console.log(remote.app.getAppPath());
-
   // Create Store
+
   const store = configureStore({
     reducer: rootReducer,
     middleware,
@@ -95,7 +98,15 @@ export const configuredStore = (initialState?: RootState) => {
         store.dispatch(changeCurrentLocaleAction({ locale: settings.locale }));
         store.dispatch(changeMessagesAction({ messages: newMessages }));
       }
+      if (settings.favoriteList) {
+        store.dispatch(
+          changeFavoriteMapListAction({
+            favoriteMapList: settings.favoriteList,
+          })
+        );
+      }
     }
+    // eslint-disable-next-line no-empty
   } catch (err) {}
 
   if (process.env.NODE_ENV === 'development' && module.hot) {

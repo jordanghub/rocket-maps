@@ -1,17 +1,10 @@
-import React, { ChangeEvent, memo, useCallback } from 'react';
-import { ISearchProps } from './interface';
+import React, { ChangeEvent, memo, useCallback, useState } from 'react';
 
 import Icon from 'components/Utils/Icon/Icon';
-import * as Styled from './Search.style';
 
-import styled from 'styled-components';
-export const Testeur = styled.div`
-  width: 24px;
-  height: 24px;
-  background: red;
-  padding: 16px;
-  border: 1px solid black;
-`;
+import debounce from 'lodash.debounce';
+import * as Styled from './Search.style';
+import { ISearchProps } from './interface';
 
 export const Search = memo(
   ({
@@ -20,54 +13,90 @@ export const Search = memo(
     placeholder,
     handleSortButtonClick,
     selectedSortMethod,
+    handleFilterButtonClick,
+    selectedFilterMethod,
   }: ISearchProps) => {
+    const [searchInput, changeSearchInput] = useState(searchValue);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const debounceChangeValue = useCallback(
+      debounce(
+        (searchString: string) => handleChange({ searchValue: searchString }),
+        300
+      ),
+      []
+    );
+
     const handleInputChange = useCallback(
       (evt: ChangeEvent<HTMLInputElement>) => {
-        handleChange({ searchValue: evt.target.value });
+        debounceChangeValue(evt.target.value);
+        changeSearchInput(evt.target.value);
       },
-      [handleChange]
+      [debounceChangeValue]
     );
 
     return (
       <Styled.Wrapper>
-        <Styled.SortButtons>
-          <Styled.SortMethodButton
-            isSelected={selectedSortMethod === 'sortAsc'}
-            onClick={() => handleSortButtonClick('sortAsc')}
-          >
-            <Icon name="sort-alpha-asc" />
-          </Styled.SortMethodButton>
-          <Styled.SortMethodButton
-            isSelected={selectedSortMethod === 'sortDesc'}
-            onClick={() => handleSortButtonClick('sortDesc')}
-          >
-            <Icon name="sort-alpha-desc" />
-          </Styled.SortMethodButton>
+        <Styled.Filters>
+          <Styled.SortButtons>
+            <Styled.SortMethodButton
+              isSelected={selectedFilterMethod === 'showAll'}
+              onClick={() => handleFilterButtonClick('showAll')}
+            >
+              <Icon name="all_inclusive" />
+            </Styled.SortMethodButton>
+            <Styled.SortMethodButton
+              isSelected={selectedFilterMethod === 'filterFavorite'}
+              onClick={() => handleFilterButtonClick('filterFavorite')}
+            >
+              <Icon name="star-full" />
+            </Styled.SortMethodButton>
+            <Styled.SortMethodButton
+              isSelected={selectedFilterMethod === 'filterNotFavorite'}
+              onClick={() => handleFilterButtonClick('filterNotFavorite')}
+            >
+              <Icon name="star-empty" />
+            </Styled.SortMethodButton>
+          </Styled.SortButtons>
+          <Styled.SortButtons>
+            <Styled.SortMethodButton
+              isSelected={selectedSortMethod === 'sortAsc'}
+              onClick={() => handleSortButtonClick('sortAsc')}
+            >
+              <Icon name="sort-alpha-asc" />
+            </Styled.SortMethodButton>
+            <Styled.SortMethodButton
+              isSelected={selectedSortMethod === 'sortDesc'}
+              onClick={() => handleSortButtonClick('sortDesc')}
+            >
+              <Icon name="sort-alpha-desc" />
+            </Styled.SortMethodButton>
 
-          <Styled.SortMethodButton
-            isSelected={selectedSortMethod === 'sortByDateAsc'}
-            onClick={() => handleSortButtonClick('sortByDateAsc')}
-          >
-            <Styled.DateIconJoined>
-              <Icon name="calendar" />
-              <Icon name="long-arrow-down" />
-            </Styled.DateIconJoined>
-          </Styled.SortMethodButton>
+            <Styled.SortMethodButton
+              isSelected={selectedSortMethod === 'sortByDateAsc'}
+              onClick={() => handleSortButtonClick('sortByDateAsc')}
+            >
+              <Styled.DateIconJoined>
+                <Icon name="calendar" />
+                <Icon name="long-arrow-down" />
+              </Styled.DateIconJoined>
+            </Styled.SortMethodButton>
 
-          <Styled.SortMethodButton
-            isSelected={selectedSortMethod === 'sortByDateDesc'}
-            onClick={() => handleSortButtonClick('sortByDateDesc')}
-          >
-            <Styled.DateIconJoined>
-              <Icon name="calendar" />
-              <Icon name="long-arrow-up" />
-            </Styled.DateIconJoined>
-          </Styled.SortMethodButton>
-        </Styled.SortButtons>
+            <Styled.SortMethodButton
+              isSelected={selectedSortMethod === 'sortByDateDesc'}
+              onClick={() => handleSortButtonClick('sortByDateDesc')}
+            >
+              <Styled.DateIconJoined>
+                <Icon name="calendar" />
+                <Icon name="long-arrow-up" />
+              </Styled.DateIconJoined>
+            </Styled.SortMethodButton>
+          </Styled.SortButtons>
+        </Styled.Filters>
 
         <input
           onChange={handleInputChange}
-          value={searchValue}
+          value={searchInput}
           type="text"
           name="search-value"
           placeholder={placeholder}

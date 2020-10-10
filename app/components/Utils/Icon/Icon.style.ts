@@ -2,9 +2,15 @@ import styled, { css } from 'styled-components';
 import { IIconStyleProps } from './interface';
 
 export const Wrapper = styled.span<IIconStyleProps>`
-  ${({ isSelected }) =>
+  ${({ isSelected, activeBackground }) =>
     isSelected &&
     css`
-      background: white;
+      background: ${activeBackground};
     `}
+
+  &:hover {
+    & svg path {
+      fill: ${(props) => props.hoveredColor}!important;
+    }
+  }
 `;

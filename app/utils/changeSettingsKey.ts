@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import fs from 'fs';
 
 import { DATA_PATH, SETTINGS_PATH } from '../appConst/path';
@@ -15,7 +16,7 @@ export const dataPathExists = () => {
   }
 };
 
-export const changeSettingsKey = (key: string, value: string) => {
+export const changeSettingsKey = (key: string, value: string | Array<any>) => {
   if (!dataPathExists()) {
     return;
   }

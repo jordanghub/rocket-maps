@@ -1,4 +1,4 @@
-import { IMessagesLabel, IMessagesLabelKey } from 'appConst/messages';
+import { IMessagesLabel } from 'appConst/messages';
 import { IMapData } from 'types';
 
 export interface IAppState {
@@ -16,6 +16,8 @@ export interface IAppState {
   locale: string;
   messages: IMessagesLabel;
   localeList: ILocaleListItem[];
+  favoriteMapList: string[];
+  isNewMapModalOpened: boolean;
 }
 
 export interface IState {

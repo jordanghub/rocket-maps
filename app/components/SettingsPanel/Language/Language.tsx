@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import { ILanguageProps, ILanguageItemProps } from './interface';
 
 import * as Styled from './Language.style';
@@ -19,7 +19,7 @@ export const LanguageItem = memo(
 export const Language = memo(
   ({ selectedLocale, localeList, handleLocaleChange }: ILanguageProps) => {
     const handleFlagClick = (localeCode: string) => {
-      return (evt: any) => {
+      return () => {
         handleLocaleChange({ localeCode });
       };
     };

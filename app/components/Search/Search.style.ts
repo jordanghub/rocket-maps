@@ -3,10 +3,6 @@ import styled, { css } from 'styled-components';
 import * as StyledIcon from 'components/Utils/Icon/Icon.style';
 import { IIconStyleProps } from 'components/Utils/Icon/interface';
 
-interface IMethodSelectedStyleProps {
-  isSelected: boolean;
-}
-
 export const Wrapper = styled.div`
   position: relative;
   margin: 1rem auto;
@@ -66,6 +62,7 @@ export const DateIconJoined = styled.div`
 export const SortMethodButton = styled.div<IIconStyleProps>`
   background: #202020;
 
+  overflow: hidden;
   &:hover {
     cursor: pointer;
   }
@@ -80,4 +77,10 @@ export const SortMethodButton = styled.div<IIconStyleProps>`
         }
       }
     `}
+`;
+
+export const Filters = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 `;

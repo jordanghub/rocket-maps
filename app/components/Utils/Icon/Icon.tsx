@@ -15,9 +15,16 @@ const Icon = ({
   isSelected = false,
   activeColor = 'black',
   onClick,
+  activeBackground = 'white',
+  hoveredColor,
 }: IIconProps) => {
   return (
-    <Styled.Wrapper isSelected={isSelected} onClick={onClick}>
+    <Styled.Wrapper
+      isSelected={isSelected}
+      onClick={onClick}
+      activeBackground={activeBackground}
+      hoveredColor={hoveredColor ?? color}
+    >
       <IcomoonReact
         className={className}
         iconSet={iconSet}
