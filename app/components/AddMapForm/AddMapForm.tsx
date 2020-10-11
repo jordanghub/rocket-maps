@@ -2,10 +2,10 @@ import React, { ChangeEvent, FormEvent, useCallback, useState } from 'react';
 import { remote } from 'electron';
 import { useDispatch } from 'react-redux';
 import { addNewMapAction } from 'store/thunk';
-import { Transition } from 'react-transition-group';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { AppDispatch } from 'index';
 import { PacmanLoader as Loader } from 'react-spinners';
+import { Modal } from 'components/Modal';
 import { IAddMapFormProps } from './interface';
 import * as Styled from './AddMapForm.style';
 
@@ -190,72 +190,64 @@ export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
   }, [handleFormValueChange]);
 
   return (
-    <Transition in={isOpened} mountOnEnter unmountOnExit timeout={300}>
-      {(animationState: string) => (
-        <Styled.ModalWrapper animationState={animationState}>
-          <Styled.ModalBackground onClick={handleClose} />
+    <Modal isOpened={isOpened} handleClose={handleClose}>
+      <Styled.Wrapper>
+        <h2>Ajouter une nouvelle map</h2>
 
-          <Styled.ModalContent>
-            <Styled.Wrapper>
-              <h2>Ajouter une nouvelle map</h2>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="input-mapName">
+            <span>Nom de la map à ajouter</span>
+            {(formValues.mapName.touched || isFormSubmitted) &&
+              formErrors.mapName && (
+                <Styled.FormError isError={!!formErrors.mapName}>
+                  {formErrors.mapName}
+                </Styled.FormError>
+              )}
+            <input
+              id="input-mapName"
+              type="text"
+              placeholder="Nom de la map"
+              value={formValues.mapName.value}
+              onChange={handleMapNameChange}
+            />
+          </label>
 
-              <form onSubmit={handleSubmit}>
-                <label htmlFor="input-mapName">
-                  <span>Nom de la map à ajouter</span>
-                  {(formValues.mapName.touched || isFormSubmitted) &&
-                    formErrors.mapName && (
-                      <Styled.FormError isError={!!formErrors.mapName}>
-                        {formErrors.mapName}
-                      </Styled.FormError>
-                    )}
-                  <input
-                    id="input-mapName"
-                    type="text"
-                    placeholder="Nom de la map"
-                    value={formValues.mapName.value}
-                    onChange={handleMapNameChange}
-                  />
-                </label>
+          <label htmlFor="input-filePath">
+            <span>
+              Chemin de l'archive contenant la map (celle téléchargée sur le
+              site au dessus)
+            </span>
+            {(formValues.archivePath.touched || isFormSubmitted) &&
+              formErrors.archivePath && (
+                <Styled.FormError isError={!!formErrors.archivePath}>
+                  {formErrors.archivePath}
+                </Styled.FormError>
+              )}
 
-                <label htmlFor="input-filePath">
-                  <span>
-                    Chemin de l'archive contenant la map (celle téléchargée sur
-                    le site au dessus)
-                  </span>
-                  {(formValues.archivePath.touched || isFormSubmitted) &&
-                    formErrors.archivePath && (
-                      <Styled.FormError isError={!!formErrors.archivePath}>
-                        {formErrors.archivePath}
-                      </Styled.FormError>
-                    )}
+            <Styled.ChooseFileButton
+              onClick={handleChooseFileButtonClick}
+              type="button"
+            >
+              Choisir le fichier
+            </Styled.ChooseFileButton>
+            <input
+              id="input-filePath"
+              type="hidden"
+              value={formValues.archivePath.value}
+            />
+          </label>
 
-                  <Styled.ChooseFileButton
-                    onClick={handleChooseFileButtonClick}
-                    type="button"
-                  >
-                    Choisir le fichier
-                  </Styled.ChooseFileButton>
-                  <input
-                    id="input-filePath"
-                    type="hidden"
-                    value={formValues.archivePath.value}
-                  />
-                </label>
-
-                <Styled.SubmitButton type="submit" disabled={isFormSubmitting}>
-                  {isFormSubmitting ? (
-                    <Styled.Loader>
-                      <Loader color="orange" size="15" />
-                    </Styled.Loader>
-                  ) : (
-                    <span>Ajouter</span>
-                  )}
-                </Styled.SubmitButton>
-              </form>
-            </Styled.Wrapper>
-          </Styled.ModalContent>
-        </Styled.ModalWrapper>
-      )}
-    </Transition>
+          <Styled.SubmitButton type="submit" disabled={isFormSubmitting}>
+            {isFormSubmitting ? (
+              <Styled.Loader>
+                <Loader color="orange" size="15" />
+              </Styled.Loader>
+            ) : (
+              <span>Ajouter</span>
+            )}
+          </Styled.SubmitButton>
+        </form>
+      </Styled.Wrapper>
+    </Modal>
   );
 };

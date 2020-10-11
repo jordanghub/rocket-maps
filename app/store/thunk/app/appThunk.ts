@@ -17,27 +17,25 @@ import extractZip from 'extract-zip';
 
 import { v4 as uuid } from 'uuid';
 
-import { IState } from 'store/features/interface';
+import {
+  IAddNewMapPayload,
+  IChangeLocalePayload,
+  IChangeMapNamePayload,
+  IDeleteMapAction,
+  ISelectMapPayload,
+  IState,
+  IToogleFavoritePayload,
+} from 'store/features/interface';
 import { DEFAULT_MAP_REPLACEMENT_NAME, GAME_MAP_FOLDER } from 'appConst/path';
 import { getMessages } from 'appConst/messages/index';
 import { createAsyncThunk } from '@reduxjs/toolkit/';
 import { AppDispatch } from 'index';
 import debounce from 'lodash.debounce';
 
-interface IChangeFavoriteList {
-  isFavorite: boolean;
-  mapId: string;
-}
-
-interface IChangeMapName {
-  newMapName: string;
-  mapId: string;
-}
-
 export const toggleFavoriteAction = ({
   isFavorite,
   mapId,
-}: IChangeFavoriteList) => async (dispatch: any) => {
+}: IToogleFavoritePayload) => async (dispatch: any) => {
   if (!isFavorite) {
     dispatch(addToFavoriteAction({ mapId }));
     return;
@@ -48,7 +46,7 @@ export const toggleFavoriteAction = ({
 export const changeMapNameAction = ({
   newMapName,
   mapId,
-}: IChangeMapName) => async (dispatch: any, getState: () => IState) => {
+}: IChangeMapNamePayload) => async (dispatch: any, getState: () => IState) => {
   const { mapList, mapFolder } = getState().app;
 
   if (newMapName.trim() === '') {
@@ -101,7 +99,7 @@ export const changeMapNameAction = ({
   } catch (err) {}
 };
 
-export const selectMapAction = ({ name }: any) => async (
+export const selectMapAction = ({ name }: ISelectMapPayload) => async (
   dispatch: any,
   getState: () => IState
 ) => {
@@ -337,7 +335,9 @@ export const fetchMapListAction = () => async (
     // Error
   }
 };
-export const changeLocaleAction = ({ localeCode }: any) => async (
+export const changeLocaleAction = ({
+  localeCode,
+}: IChangeLocalePayload) => async (
   dispatch: AppDispatch,
   getState: () => IState
 ) => {
@@ -356,7 +356,7 @@ export const changeLocaleAction = ({ localeCode }: any) => async (
 
 export const addNewMapAction = createAsyncThunk(
   'app/addNewMapAsyncStatus',
-  async ({ mapName, archivePath }: any, thunkApi) => {
+  async ({ mapName, archivePath }: IAddNewMapPayload, thunkApi) => {
     const { mapFolder } = (thunkApi.getState() as IState).app;
 
     //  Pas de dossier contenant les maps
@@ -398,6 +398,46 @@ export const addNewMapAction = createAsyncThunk(
     } catch (err) {}
   }
 );
+
+export const deleteMapAction = ({ mapId }: IDeleteMapAction) => async (
+  dispatch: any,
+  getState: () => IState
+) => {
+  const { mapFolder, mapList, favoriteMapList } = getState().app;
+
+  const selectedMap = mapList.find((map) => map.id === mapId);
+
+  if (!selectedMap) {
+    return;
+  }
+
+  if (mapFolder === '' || !fs.existsSync(mapFolder)) {
+    return;
+  }
+
+  const dirToRemove = path.join(mapFolder, selectedMap.name);
+
+  if (!fs.existsSync(dirToRemove)) {
+    return;
+  }
+
+  try {
+    fs.rmdirSync(dirToRemove, { recursive: true });
+
+    if (favoriteMapList.includes(mapId)) {
+      dispatch(
+        removeFromFavoriteAction({
+          mapId,
+        })
+      );
+    }
+
+    // Flash message tout s'est bien passé
+  } catch (err) {
+    // flash message une erreur ...
+  }
+};
+
 export const initMapWatchAction = () => async (
   dispatch: any,
   getState: () => IState
