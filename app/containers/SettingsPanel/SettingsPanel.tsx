@@ -3,10 +3,7 @@ import React, { memo, useCallback, useRef } from 'react';
 
 import { remote } from 'electron';
 
-import * as Styled from './SettingsPanel.style';
-import { ReplacementMap } from '../../components/SettingsPanel/ReplacementMap';
 import { useTranslation } from 'hooks/useTranslation';
-import { Language } from '../../components/SettingsPanel/Language/Language';
 import { Transition } from 'react-transition-group';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -18,6 +15,9 @@ import {
 import { changeLocaleAction } from 'store/thunk';
 import { DEFAULT_MAP_REPLACEMENT_NAME } from 'appConst/path';
 import { IState } from 'store/features/interface';
+import { ReplacementMap } from '../../components/SettingsPanel/ReplacementMap';
+import { Language } from '../../components/SettingsPanel/Language/Language';
+import * as Styled from './SettingsPanel.style';
 
 export const SettingsPanel = memo(() => {
   const ref = useRef(null);
@@ -95,7 +95,9 @@ export const SettingsPanel = memo(() => {
       }
 
       handleRocketPathChange({ path: result.filePaths[0] });
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -104,7 +106,8 @@ export const SettingsPanel = memo(() => {
         <Styled.Wrapper ref={ref} animationState={state}>
           <h3>{translate('SETTINGS_PANEL_TITLE')}</h3>
 
-          <p>{translate('MAP_PATH_LABEL')}: </p>
+          {/* eslint-disable-next-line react/jsx-one-expression-per-line */}
+          <p>{translate('MAP_PATH_LABEL')}:</p>
           <small>
             {mapFolder !== '' ? mapFolder : translate('NO_PATH_DETECTED')}
           </small>

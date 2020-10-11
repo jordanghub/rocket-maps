@@ -32,7 +32,8 @@ export type IIconNames =
   | 'plus'
   | 'all_inclusive'
   | 'pencil'
-  | 'bin';
+  | 'bin'
+  | 'play2';
 
 interface IIconStyleProps {
   isSelected: boolean;

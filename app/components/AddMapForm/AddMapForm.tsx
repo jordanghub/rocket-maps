@@ -226,6 +226,12 @@ export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
                 </Styled.FormError>
               )}
 
+            <small style={{ margin: '0 0 1rem 0' }}>
+              {formValues.archivePath.value !== ''
+                ? formValues.archivePath.value
+                : 'Aucun chemin selectionné'}
+            </small>
+
             <Styled.ChooseFileButton
               onClick={handleChooseFileButtonClick}
               type="button"

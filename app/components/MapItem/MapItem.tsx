@@ -102,17 +102,11 @@ export const MapItem = memo(
               activeColor="orange"
               activeBackground="transparent"
             />
-            {isEditMode ? (
+            {isEditMode && (
               <Icon
                 name="bin"
                 hoveredColor="red"
                 onClick={() => deleteMapItem(id)}
-              />
-            ) : (
-              <Icon
-                name="plus"
-                onClick={handleClick}
-                hoveredColor="lightgreen"
               />
             )}
           </Styled.Actions>
@@ -146,6 +140,15 @@ export const MapItem = memo(
           )}
 
           <Styled.ThumbnailContainer>
+            <Styled.PlayButton>
+              <Icon
+                name="play2"
+                // onClick={handleClick}
+                color="lightgreen"
+                size={100}
+                onClick={handleClick}
+              />
+            </Styled.PlayButton>
             {thumbnail ? (
               <img
                 src={`file:///${mapFolder}/${name}/preview.png`}

@@ -13,7 +13,7 @@ import {
 } from 'store/features';
 import chokidar from 'chokidar';
 
-import extractZip from 'extract-zip';
+import extractZip from 'decompress';
 
 import { v4 as uuid } from 'uuid';
 
@@ -109,15 +109,6 @@ export const selectMapAction = ({ name }: ISelectMapPayload) => async (
 ) => {
   const { messages } = getState().app;
   // Flash message pour annoncer que le changement de map a commencé
-
-  dispatch(
-    addFlashMessageAction({
-      message: messages.MAP_CHANGE_STARTED,
-      config: {
-        type: 'warning',
-      },
-    })
-  );
 
   const { rocketPath, mapFolder } = getState().app;
 
@@ -376,48 +367,43 @@ export const addNewMapAction = createAsyncThunk(
     if (mapFolder === '' || !fs.existsSync(mapFolder)) {
       return;
     }
-    try {
-      if (fs.existsSync(path.join(mapFolder, mapName))) {
-        // Une map existe déjà avec ce nom , cancel l'ajout
-        return {
-          mapName: MessagesLabelKey.MAP_ALREADY_EXISTS,
-        };
-      }
-
-      if (!fs.existsSync(archivePath)) {
-        // L'archive n'existe pas
-        return {
-          archivePath: MessagesLabelKey.NEW_MAP_FORM_ERROR_ARCHIVE_DOESNT_EXIST,
-        };
-      }
-
-      await extractZip(archivePath, {
-        dir: path.join(mapFolder, mapName),
-      });
-
-      thunkApi.dispatch(
-        addFlashMessageAction({
-          message: messages.NEW_MAP_FORM_SUBMIT_SUCCESS,
-          config: {
-            type: 'success',
-          },
-        })
-      );
-
-      return true;
-
-      // dispatch flash message, ajouté avec success ou quelque chose comme ça
-      // eslint-disable-next-line no-empty
-    } catch (err) {
-      thunkApi.dispatch(
-        addFlashMessageAction({
-          message: messages.NEW_MAP_FORM_SUBMIT_FAILED,
-          config: {
-            type: 'error',
-          },
-        })
-      );
+    if (fs.existsSync(path.join(mapFolder, mapName))) {
+      // Une map existe déjà avec ce nom , cancel l'ajout
+      return {
+        mapName: MessagesLabelKey.MAP_ALREADY_EXISTS,
+      };
     }
+
+    if (!fs.existsSync(archivePath)) {
+      // L'archive n'existe pas
+      return {
+        archivePath: MessagesLabelKey.NEW_MAP_FORM_ERROR_ARCHIVE_DOESNT_EXIST,
+      };
+    }
+
+    return extractZip(archivePath, path.join(mapFolder, mapName))
+      .then(() => {
+        thunkApi.dispatch(
+          addFlashMessageAction({
+            message: messages.NEW_MAP_FORM_SUBMIT_SUCCESS,
+            config: {
+              type: 'success',
+            },
+          })
+        );
+
+        return true;
+      })
+      .catch((err) => {
+        thunkApi.dispatch(
+          addFlashMessageAction({
+            message: messages.NEW_MAP_FORM_SUBMIT_FAILED,
+            config: {
+              type: 'error',
+            },
+          })
+        );
+      });
   }
 );
 
@@ -476,6 +462,8 @@ export const deleteMapAction = ({ mapId }: IDeleteMapPayload) => async (
   }
 };
 
+let watcher: null | chokidar.FSWatcher = null;
+
 export const initMapWatchAction = () => async (
   dispatch: any,
   getState: () => IState
@@ -486,14 +474,17 @@ export const initMapWatchAction = () => async (
     return;
   }
 
-  const watcher = chokidar.watch(mapFolderPath, {
+  if (watcher !== null) {
+    watcher.close();
+  }
+
+  watcher = chokidar.watch(mapFolderPath, {
     ignoreInitial: true,
   });
 
-  const watcherEvent = debounce((name: string) => {
-    if (name !== 'change') {
-      dispatch(fetchMapListAction());
-    }
+  const watcherEvent = debounce((_name, filePath) => {
+    console.log(filePath);
+    dispatch(fetchMapListAction());
   }, 100);
 
   watcher.on('all', watcherEvent);

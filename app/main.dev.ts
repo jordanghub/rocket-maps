@@ -10,11 +10,13 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
+
 import path from 'path';
 import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import MenuBuilder from './menu';
+
+require('setimmediate');
 
 export default class AppUpdater {
   constructor() {
@@ -37,6 +39,9 @@ if (
 ) {
   require('electron-debug')();
 }
+
+const setImmediateO = setImmediate;
+const clearImmediateO = clearImmediate;
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
@@ -64,21 +69,25 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  // preload.js
+  process.on('loaded', () => {
+    console.log('process loaded lol');
+    global.setImmediate = setImmediateO;
+    global.clearImmediate = clearImmediateO;
+  });
+
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728,
     icon: getAssetPath('icon.png'),
-    webPreferences:
-      (process.env.NODE_ENV === 'development' ||
-        process.env.E2E_BUILD === 'true') &&
-      process.env.ERB_SECURE !== 'true'
-        ? {
-            nodeIntegration: true,
-          }
-        : {
-            preload: path.join(__dirname, 'dist/renderer.prod.js'),
-          },
+    webPreferences: {
+      nodeIntegration: !(process.env.NODE_ENV === 'production'),
+      preload:
+        process.env.NODE_ENV === 'production'
+          ? path.join(__dirname, 'dist', 'renderer.prod.js')
+          : undefined,
+    },
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
@@ -108,6 +117,9 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
+
+  mainWindow.webContents.openDevTools();
+  // eslint-disable-next-line no-new
   new AppUpdater();
 };
 

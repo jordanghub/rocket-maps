@@ -41,19 +41,29 @@ export const Actions = styled.div`
     margin-left: 0.5rem;
   }
 
-  /* ${StyledIcon.Wrapper}:last-child {
-    &:hover {
-      & svg path {
-        fill: lightgreen !important;
-      }
-    }
-  } */
   ${StyledIcon.Wrapper}:first-child {
     &:hover {
       & svg path {
         fill: orange !important;
       }
     }
+  }
+`;
+
+export const PlayButton = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.4);
+    cursor: pointer;
   }
 `;
 
@@ -79,13 +89,13 @@ export const MapItemInput = styled.div`
 `;
 export const NoThumbnail = styled.div`
   width: 100%;
-  background: rgba(255, 255, 255, 0.6);
+  background: #202020;
   height: 100%;
 
   display: flex;
   justify-content: center;
   align-items: center;
-  color: black;
+  color: white;
 `;
 
 export const Wrapper = styled.div<IWrapperProps>`
@@ -99,6 +109,11 @@ export const Wrapper = styled.div<IWrapperProps>`
   width: 100%;
 
   will-change: transform;
+  ${StyledIcon.Wrapper} {
+    &:hover {
+      cursor: pointer;
+    }
+  }
 
   & h3 {
     margin-top: 0;
@@ -118,12 +133,11 @@ export const Wrapper = styled.div<IWrapperProps>`
   ${(props) =>
     props.selected &&
     css`
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.04);
     `}
 
   &:hover {
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
   }
 
   @media screen and (min-width: 1000px) {
@@ -140,6 +154,13 @@ export const Wrapper = styled.div<IWrapperProps>`
 export const ThumbnailContainer = styled.div`
   width: 300px;
   height: 300px;
+  position: relative;
+
+  &:hover {
+    ${PlayButton} {
+      display: flex;
+    }
+  }
 
   & img {
     width: 100%;
