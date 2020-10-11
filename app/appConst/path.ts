@@ -16,12 +16,10 @@ export const RESOURCES_PATH = remote.app.isPackaged
 
 export const getAssetPath = (...paths: string[]): string => {
   return process.env.NODE_ENV === 'production'
-    ? (
-        dirname(remote.app.getPath('exe')) +
-        '/resources/resources/' +
-        paths.join('/')
-      ).replaceAll('\\', '/')
-    : './' + paths.join('/');
+    ? `${dirname(remote.app.getPath('exe'))}/resources/resources/${paths.join(
+        '/'
+      )}`.replaceAll('\\', '/')
+    : './';
 };
 
 export const GAME_MAP_FOLDER = path.join('TAGame', 'CookedPCConsole');

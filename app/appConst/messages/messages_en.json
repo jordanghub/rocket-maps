@@ -22,5 +22,22 @@
   "NO_SEARCH_RESULT": "No search result",
   "NO_MAPS": "No maps detected",
   "WORKSHOP_LINK_LABEL": "Workshop",
-  "WORSKHOP_DOWNLOAD_LINK_LABEL": "Map download"
+  "WORSKHOP_DOWNLOAD_LINK_LABEL": "Map download",
+  "MAP_ALREADY_EXISTS": "The map already exists",
+  
+  "NEW_MAP_FORM_TITLE": "Add a new map",
+  "NEW_MAP_FORM_MAP_NAME_LABEL": "New map name",
+  "NEW_MAP_FORM_MAP_NAME_PLACEHOLDER": "Map name",
+  "NEW_MAP_FORM_ARCHIVE_LABEL": "Archive path (the one you downloaded from the website above)",
+  "NEW_MAP_FORM_CHOOSE_FILE": "Choose file",
+  "NEW_MAP_FORM_SUBMIT_BUTTON": "Add the map",
+  "NEW_MAP_FORM_ERROR_MAP_NAME_EMPTY": "The map name cannot be empty",
+  "NEW_MAP_FORM_ERROR_ARCHIVE_PATH_EMPTY": "The archive path cannot be empty",
+  "NEW_MAP_FORM_ERROR_ARCHIVE_DOESNT_EXIST": "The selected archive doesn't exit",
+  "NEW_MAP_FORM_SUBMIT_SUCCESS": "Map added successfully",
+  "NEW_MAP_FORM_SUBMIT_FAILED": "The map couldn't be added",
+
+  "DELETE_MAP_SUCCESS": "The map has been successfully deleted",
+  "DELETE_MAP_FAILED": "The map couldn't be deleted"
+
 }

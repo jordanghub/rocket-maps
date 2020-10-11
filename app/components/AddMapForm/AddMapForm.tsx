@@ -3,15 +3,17 @@ import { remote } from 'electron';
 import { useDispatch } from 'react-redux';
 import { addNewMapAction } from 'store/thunk';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { AppDispatch } from 'index';
+import { AppDispatch } from 'store/store';
 import { PacmanLoader as Loader } from 'react-spinners';
 import { Modal } from 'components/Modal';
+import { useTranslation } from 'hooks/useTranslation';
+import { IMessagePossibleValues, MessagesLabelKey } from 'appConst/messages';
 import { IAddMapFormProps } from './interface';
 import * as Styled from './AddMapForm.style';
 
 interface IFormErrors {
-  mapName?: string;
-  archivePath?: string;
+  mapName?: IMessagePossibleValues;
+  archivePath?: IMessagePossibleValues;
 }
 
 interface IFormInput {
@@ -37,13 +39,14 @@ interface IChangeInputValue {
   data: IChangeInputDataProps;
 }
 
-const validateFormData = ({ mapName, archivePath }: IFormErrors) => {
+export const validateFormData = ({ mapName, archivePath }: IFormErrors) => {
   const errors: IFormErrors = {};
+
   if (!mapName || (mapName && mapName.trim() === '')) {
-    errors.mapName = 'Le nom de la map ne doit pas être vide';
+    errors.mapName = MessagesLabelKey.NEW_MAP_FORM_ERROR_MAP_NAME_EMPTY;
   }
   if (!archivePath || (archivePath && archivePath.trim() === '')) {
-    errors.archivePath = "Le chemin vers l'archive ne doit pas être vide";
+    errors.archivePath = MessagesLabelKey.NEW_MAP_FORM_ERROR_ARCHIVE_PATH_EMPTY;
   }
 
   return errors;
@@ -69,6 +72,8 @@ export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
   const [isFormSubmitted, changeIsFormSubmitted] = useState(false);
   const [isFormSubmitting, changeisFormSubmitting] = useState(false);
   const [formErrors, changeFormErrors] = useState<IFormErrors>({});
+
+  const { translate } = useTranslation();
 
   const handleFormValueChange = useCallback(
     ({ key, data }: IChangeInputValue) => {
@@ -190,37 +195,34 @@ export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
   }, [handleFormValueChange]);
 
   return (
-    <Modal isOpened={isOpened} handleClose={handleClose}>
+    <Modal isOpened={isOpened} handleClose={handleClose} background="#202020">
       <Styled.Wrapper>
-        <h2>Ajouter une nouvelle map</h2>
+        <h2>{translate('NEW_MAP_FORM_TITLE')}</h2>
 
         <form onSubmit={handleSubmit}>
           <label htmlFor="input-mapName">
-            <span>Nom de la map à ajouter</span>
+            <span>{translate('NEW_MAP_FORM_MAP_NAME_LABEL')}</span>
             {(formValues.mapName.touched || isFormSubmitted) &&
               formErrors.mapName && (
                 <Styled.FormError isError={!!formErrors.mapName}>
-                  {formErrors.mapName}
+                  {translate(formErrors.mapName)}
                 </Styled.FormError>
               )}
             <input
               id="input-mapName"
               type="text"
-              placeholder="Nom de la map"
+              placeholder={translate('NEW_MAP_FORM_MAP_NAME_PLACEHOLDER')}
               value={formValues.mapName.value}
               onChange={handleMapNameChange}
             />
           </label>
 
           <label htmlFor="input-filePath">
-            <span>
-              Chemin de l'archive contenant la map (celle téléchargée sur le
-              site au dessus)
-            </span>
+            <span>{translate('NEW_MAP_FORM_ARCHIVE_LABEL')}</span>
             {(formValues.archivePath.touched || isFormSubmitted) &&
               formErrors.archivePath && (
                 <Styled.FormError isError={!!formErrors.archivePath}>
-                  {formErrors.archivePath}
+                  {translate(formErrors.archivePath)}
                 </Styled.FormError>
               )}
 
@@ -228,7 +230,7 @@ export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
               onClick={handleChooseFileButtonClick}
               type="button"
             >
-              Choisir le fichier
+              {translate('NEW_MAP_FORM_CHOOSE_FILE')}
             </Styled.ChooseFileButton>
             <input
               id="input-filePath"
@@ -243,7 +245,7 @@ export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
                 <Loader color="orange" size="15" />
               </Styled.Loader>
             ) : (
-              <span>Ajouter</span>
+              <span>{translate('NEW_MAP_FORM_SUBMIT_BUTTON')}</span>
             )}
           </Styled.SubmitButton>
         </form>

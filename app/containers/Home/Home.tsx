@@ -14,6 +14,7 @@ import {
 
 import {
   changeMapNameAction,
+  deleteMapAction,
   initMapWatchAction,
   selectMapAction,
   toggleFavoriteAction,
@@ -124,6 +125,11 @@ export const Home = memo(() => {
     [dispatch]
   );
 
+  const deleteMap = useCallback(
+    (id: string) => dispatch(deleteMapAction({ mapId: id })),
+    [dispatch]
+  );
+
   const initMapWatch = useCallback(() => dispatch(initMapWatchAction()), [
     dispatch,
   ]);
@@ -195,12 +201,13 @@ export const Home = memo(() => {
           type="button"
           onClick={() => changeIsNewMapModalOpen({ status: true })}
         >
-          Ajouter une map
+          {translate('NEW_MAP_FORM_TITLE')}
         </button>
       </Styled.ActionsSidebar>
 
       {filteredMapList && (
         <MapContainer
+          deleteMapItem={deleteMap}
           flipKey={selectedSortMethod.name}
           toggleMapFavoriteAction={toggleMapFavoriteAction}
           filteredMapList={filteredMapList}

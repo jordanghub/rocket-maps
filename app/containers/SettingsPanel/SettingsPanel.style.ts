@@ -11,7 +11,7 @@ export const Wrapper = styled.div<IWrapperProps>`
   height: 100vh;
   width: 50%;
   max-width: 600px;
-  position: fixed;
+  position: fixed !important;
   right: 0;
   top: 0;
   background: rgba(0, 0, 0, 0.9);

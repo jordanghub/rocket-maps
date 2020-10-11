@@ -34,6 +34,7 @@ export const FormError = styled.small<IFormErrorStyleProps>`
 `;
 
 export const Wrapper = styled.div`
+  padding: 1rem;
   & h2 {
     text-transform: uppercase;
     text-align: center;
@@ -70,9 +71,13 @@ export const Wrapper = styled.div`
     width: 100%;
     text-align: center;
     max-width: 300px;
+    border: 1px solid transparent;
 
     &:hover {
       cursor: pointer;
+      background: transparent;
+      color: white;
+      border: 1px solid white;
     }
   }
 `;

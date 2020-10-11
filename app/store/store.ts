@@ -120,3 +120,7 @@ export const configuredStore = (initialState?: RootState) => {
 };
 export type Store = ReturnType<typeof configuredStore>;
 export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
+
+export const store = configuredStore();
+
+export type AppDispatch = typeof store.dispatch;

@@ -25,6 +25,7 @@ export const MapItem = memo(
     isFavorite = true,
     toggleMapFavoriteAction,
     changeMapName,
+    deleteMapItem,
   }: IMapItemProps) => {
     const [isFavoriteIconHovered, changeIsFavoriteIconHovered] = useState(
       false
@@ -77,7 +78,7 @@ export const MapItem = memo(
           spring({
             onUpdate: (val: number | Record<string, number>) => {
               el.style.opacity = (val as any) as string;
-              el.style.transition = 'opacity 10ms';
+              el.style.transition = 'opacity 300ms';
             },
             delay: index * 2,
           });
@@ -102,7 +103,11 @@ export const MapItem = memo(
               activeBackground="transparent"
             />
             {isEditMode ? (
-              <Icon name="bin" hoveredColor="red" />
+              <Icon
+                name="bin"
+                hoveredColor="red"
+                onClick={() => deleteMapItem(id)}
+              />
             ) : (
               <Icon
                 name="plus"

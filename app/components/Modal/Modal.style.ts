@@ -4,6 +4,10 @@ interface IModalWrapperStyleProps {
   animationState: string;
 }
 
+interface IModalContentStyleProps {
+  background: string;
+}
+
 export const ModalWrapper = styled.div<IModalWrapperStyleProps>`
   position: fixed !important;
   left: 0;
@@ -32,15 +36,12 @@ export const ModalBackground = styled.div`
   height: 100%;
 `;
 
-export const ModalContent = styled.div`
+export const ModalContent = styled.div<IModalContentStyleProps>`
   padding: 1rem;
   max-width: 800px;
   width: 100%;
-  background: #202020;
-  color: white;
-
+  background: ${(props) => props.background};
   min-height: 300px;
-
   position: relative;
   margin: auto;
 `;

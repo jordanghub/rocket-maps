@@ -15,6 +15,7 @@ export const MapContainer = memo(
     toggleMapFavoriteAction,
     favoriteMapList,
     changeMapName,
+    deleteMapItem,
   }: IMapContainerProps) => {
     const { translate } = useTranslation();
 
@@ -30,6 +31,7 @@ export const MapContainer = memo(
         <Styled.MapContainer flipKey={flipKey} spring="veryGentle">
           {filteredMapList.map((item) => (
             <MapItem
+              deleteMapItem={deleteMapItem}
               key={item.id}
               id={item.id}
               toggleMapFavoriteAction={toggleMapFavoriteAction}

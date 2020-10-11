@@ -162,6 +162,6 @@ export interface IAddNewMapPayload {
   archivePath: string;
 }
 
-export interface IDeleteMapAction {
+export interface IDeleteMapPayload {
   mapId: string;
 }

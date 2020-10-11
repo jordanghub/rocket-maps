@@ -21,15 +21,19 @@ import {
   IAddNewMapPayload,
   IChangeLocalePayload,
   IChangeMapNamePayload,
-  IDeleteMapAction,
+  IDeleteMapPayload,
   ISelectMapPayload,
   IState,
   IToogleFavoritePayload,
 } from 'store/features/interface';
 import { DEFAULT_MAP_REPLACEMENT_NAME, GAME_MAP_FOLDER } from 'appConst/path';
-import { getMessages } from 'appConst/messages/index';
+import {
+  getMessages,
+  IMessagePossibleValues,
+  MessagesLabelKey,
+} from 'appConst/messages/index';
 import { createAsyncThunk } from '@reduxjs/toolkit/';
-import { AppDispatch } from 'index';
+import { AppDispatch } from 'store/store';
 import debounce from 'lodash.debounce';
 
 export const toggleFavoriteAction = ({
@@ -47,13 +51,13 @@ export const changeMapNameAction = ({
   newMapName,
   mapId,
 }: IChangeMapNamePayload) => async (dispatch: any, getState: () => IState) => {
-  const { mapList, mapFolder } = getState().app;
+  const { mapList, mapFolder, messages } = getState().app;
 
   if (newMapName.trim() === '') {
     // Le nom est vide
     dispatch(
       addFlashMessageAction({
-        message: 'Le nom de la map ne peut pas être vide',
+        message: messages.NEW_MAP_FORM_ERROR_MAP_NAME_EMPTY,
         config: {
           type: 'error',
         },
@@ -67,7 +71,7 @@ export const changeMapNameAction = ({
   if (!mapToChange || !fs.existsSync(path.join(mapFolder, mapToChange.name))) {
     dispatch(
       addFlashMessageAction({
-        message: "La map n'existe pas",
+        message: messages.MAP_DOESNT_EXIST,
         config: {
           type: 'error',
         },
@@ -354,10 +358,19 @@ export const changeLocaleAction = ({
   dispatch(changeMessagesAction({ messages: newMessages }));
 };
 
+export interface IFormErrorObject {
+  [key: string]: IMessagePossibleValues;
+}
+
+export type IAddNewMapActionReturnType = void | boolean | IFormErrorObject;
+
 export const addNewMapAction = createAsyncThunk(
   'app/addNewMapAsyncStatus',
-  async ({ mapName, archivePath }: IAddNewMapPayload, thunkApi) => {
-    const { mapFolder } = (thunkApi.getState() as IState).app;
+  async (
+    { mapName, archivePath }: IAddNewMapPayload,
+    thunkApi
+  ): Promise<IAddNewMapActionReturnType> => {
+    const { mapFolder, messages } = (thunkApi.getState() as IState).app;
 
     //  Pas de dossier contenant les maps
     if (mapFolder === '' || !fs.existsSync(mapFolder)) {
@@ -367,14 +380,14 @@ export const addNewMapAction = createAsyncThunk(
       if (fs.existsSync(path.join(mapFolder, mapName))) {
         // Une map existe déjà avec ce nom , cancel l'ajout
         return {
-          mapName: 'Il y a déjà une map portant ce nom',
+          mapName: MessagesLabelKey.MAP_ALREADY_EXISTS,
         };
       }
 
       if (!fs.existsSync(archivePath)) {
         // L'archive n'existe pas
         return {
-          archivePath: "L'archive n'existe pas",
+          archivePath: MessagesLabelKey.NEW_MAP_FORM_ERROR_ARCHIVE_DOESNT_EXIST,
         };
       }
 
@@ -384,7 +397,7 @@ export const addNewMapAction = createAsyncThunk(
 
       thunkApi.dispatch(
         addFlashMessageAction({
-          message: 'Map ajoutée avec succès',
+          message: messages.NEW_MAP_FORM_SUBMIT_SUCCESS,
           config: {
             type: 'success',
           },
@@ -395,15 +408,24 @@ export const addNewMapAction = createAsyncThunk(
 
       // dispatch flash message, ajouté avec success ou quelque chose comme ça
       // eslint-disable-next-line no-empty
-    } catch (err) {}
+    } catch (err) {
+      thunkApi.dispatch(
+        addFlashMessageAction({
+          message: messages.NEW_MAP_FORM_SUBMIT_FAILED,
+          config: {
+            type: 'error',
+          },
+        })
+      );
+    }
   }
 );
 
-export const deleteMapAction = ({ mapId }: IDeleteMapAction) => async (
+export const deleteMapAction = ({ mapId }: IDeleteMapPayload) => async (
   dispatch: any,
   getState: () => IState
 ) => {
-  const { mapFolder, mapList, favoriteMapList } = getState().app;
+  const { mapFolder, mapList, favoriteMapList, messages } = getState().app;
 
   const selectedMap = mapList.find((map) => map.id === mapId);
 
@@ -432,9 +454,25 @@ export const deleteMapAction = ({ mapId }: IDeleteMapAction) => async (
       );
     }
 
+    dispatch(
+      addFlashMessageAction({
+        message: messages.DELETE_MAP_SUCCESS,
+        config: {
+          type: 'success',
+        },
+      })
+    );
+
     // Flash message tout s'est bien passé
   } catch (err) {
-    // flash message une erreur ...
+    dispatch(
+      addFlashMessageAction({
+        message: messages.DELETE_MAP_FAILED,
+        config: {
+          type: 'error',
+        },
+      })
+    );
   }
 };
 

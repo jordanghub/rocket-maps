@@ -10,4 +10,5 @@ export interface IMapItemProps {
   isFavorite?: boolean;
   toggleMapFavoriteAction: (payload: any) => void;
   changeMapName: (payload: any) => void;
+  deleteMapItem: (id: string) => void;
 }

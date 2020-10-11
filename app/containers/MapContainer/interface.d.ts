@@ -11,4 +11,5 @@ export interface IMapContainerProps {
   toggleMapFavoriteAction: (payload: any) => void;
   flipKey: ISortMethodName;
   changeMapName: (payload: any) => void;
+  deleteMapItem: (id: string) => void;
 }
