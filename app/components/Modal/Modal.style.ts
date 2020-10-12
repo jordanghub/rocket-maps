@@ -39,7 +39,7 @@ export const ModalBackground = styled.div`
 export const ModalContent = styled.div<IModalContentStyleProps>`
   padding: 1rem;
   max-width: 1000px;
-  box-shadow: 0px 0px 2px 3px rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 3px 3px rgba(120, 120, 120, 1);
   width: 100%;
   background: ${(props) => props.background};
   min-height: 300px;

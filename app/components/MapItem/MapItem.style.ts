@@ -5,17 +5,25 @@ import { Flipped } from 'react-flip-toolkit';
 
 interface IWrapperProps {
   selected: boolean;
+  isEditMode: boolean;
 }
 
-const inputColorChange = keyframes`
-  0% {
-    border-color: white;
+const shakeAnimation = keyframes`
+
+  10%, 90% {
+    transform: translate3d(-0.5px, 0, 0);
   }
-  50% {
-    border-color: darkorange;
+  
+  20%, 80% {
+    transform: translate3d(0.5px, 0, 0);
   }
-  100% {
-    border-color: white;
+
+  30%, 50%, 70% {
+    transform: translate3d(-0.7px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(0.7px, 0, 0);
   }
 `;
 
@@ -79,12 +87,9 @@ export const MapItemInput = styled.div`
     outline: none;
     text-align: center;
     font-size: 1.17em;
-    border-bottom: 3px solid transparent;
-    /* border-right: 3px solid transparent; */
+    border-bottom: 3px solid orange;
     padding: 0.5rem;
     max-width: 100%;
-
-    animation: ${inputColorChange} 2s linear infinite;
   }
 `;
 export const NoThumbnail = styled.div`
@@ -134,6 +139,13 @@ export const Wrapper = styled.div<IWrapperProps>`
     props.selected &&
     css`
       background: rgba(255, 255, 255, 0.04);
+    `}
+
+  ${(props) =>
+    props.isEditMode &&
+    css`
+      animation: ${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97)
+        infinite both;
     `}
 
   &:hover {

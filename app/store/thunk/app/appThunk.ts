@@ -483,7 +483,6 @@ export const initMapWatchAction = () => async (
   });
 
   const watcherEvent = debounce((_name, filePath) => {
-    console.log(filePath);
     dispatch(fetchMapListAction());
   }, 100);
 

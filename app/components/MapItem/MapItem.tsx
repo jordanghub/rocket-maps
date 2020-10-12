@@ -78,7 +78,7 @@ export const MapItem = memo(
           spring({
             onUpdate: (val: number | Record<string, number>) => {
               el.style.opacity = (val as any) as string;
-              el.style.transition = 'opacity 300ms';
+              el.style.transition = 'opacity 150ms';
             },
             delay: index * 2,
           });
@@ -93,7 +93,7 @@ export const MapItem = memo(
           });
         }}
       >
-        <Styled.Wrapper selected={selected} ref={ref}>
+        <Styled.Wrapper selected={selected} ref={ref} isEditMode={isEditMode}>
           <Styled.Actions>
             <Icon
               name="pencil"

@@ -16,8 +16,6 @@ import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 
-require('setimmediate');
-
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -39,9 +37,6 @@ if (
 ) {
   require('electron-debug')();
 }
-
-const setImmediateO = setImmediate;
-const clearImmediateO = clearImmediate;
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
@@ -69,17 +64,10 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  // preload.js
-  process.on('loaded', () => {
-    console.log('process loaded lol');
-    global.setImmediate = setImmediateO;
-    global.clearImmediate = clearImmediateO;
-  });
-
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 1200,
+    height: 862,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: !(process.env.NODE_ENV === 'production'),
@@ -118,7 +106,7 @@ const createWindow = async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
 
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
   // eslint-disable-next-line no-new
   new AppUpdater();
 };

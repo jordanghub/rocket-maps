@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { remote } from 'electron';
 import { useDispatch } from 'react-redux';
 import { addNewMapAction } from 'store/thunk';
@@ -7,40 +7,19 @@ import { AppDispatch } from 'store/store';
 import { PacmanLoader as Loader } from 'react-spinners';
 import { Modal } from 'components/Modal';
 import { useTranslation } from 'hooks/useTranslation';
-import { IMessagePossibleValues, MessagesLabelKey } from 'appConst/messages';
+import { MessagesLabelKey } from 'appConst/messages';
+import {
+  Form,
+  Field,
+  FormRenderProps,
+  AnyObject,
+  FieldRenderProps,
+} from 'react-final-form';
 import { IAddMapFormProps } from './interface';
 import * as Styled from './AddMapForm.style';
 
-interface IFormErrors {
-  mapName?: IMessagePossibleValues;
-  archivePath?: IMessagePossibleValues;
-}
-
-interface IFormInput {
-  name: string;
-  value: any;
-  touched: boolean;
-  error: string;
-}
-
-interface IFormValues {
-  [key: string]: IFormInput;
-}
-
-interface IChangeInputDataProps {
-  name?: string;
-  value: any;
-  touched?: boolean;
-  error?: string;
-}
-
-interface IChangeInputValue {
-  key: string;
-  data: IChangeInputDataProps;
-}
-
-export const validateFormData = ({ mapName, archivePath }: IFormErrors) => {
-  const errors: IFormErrors = {};
+export const validateFormData = ({ mapName, archivePath }: AnyObject) => {
+  const errors: AnyObject = {};
 
   if (!mapName || (mapName && mapName.trim() === '')) {
     errors.mapName = MessagesLabelKey.NEW_MAP_FORM_ERROR_MAP_NAME_EMPTY;
@@ -52,54 +31,9 @@ export const validateFormData = ({ mapName, archivePath }: IFormErrors) => {
   return errors;
 };
 
-const initialFormValues: IFormValues = {
-  mapName: {
-    name: 'mapName',
-    value: '',
-    touched: false,
-    error: '',
-  },
-  archivePath: {
-    name: 'archivePath',
-    value: '',
-    touched: false,
-    error: '',
-  },
-};
-
 export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
-  const [formValues, changeFormValues] = useState(initialFormValues);
-  const [isFormSubmitted, changeIsFormSubmitted] = useState(false);
-  const [isFormSubmitting, changeisFormSubmitting] = useState(false);
-  const [formErrors, changeFormErrors] = useState<IFormErrors>({});
-
-  const { translate } = useTranslation();
-
-  const handleFormValueChange = useCallback(
-    ({ key, data }: IChangeInputValue) => {
-      const formData = Object.entries(formValues);
-
-      const values: any = {};
-
-      formData.forEach(([itemKey, itemData]) => {
-        values[itemKey] = key === itemKey ? data.value : itemData.value;
-      });
-
-      const newFormValues = {
-        ...formValues,
-        [key]: {
-          ...formValues[key],
-          touched: true,
-          ...data,
-        },
-      };
-      changeFormValues(newFormValues);
-      changeFormErrors(validateFormData(values));
-    },
-    [formValues]
-  );
-
   const dispatch: AppDispatch = useDispatch();
+  const { translate } = useTranslation();
 
   const addMapSubmit = useCallback(
     async (payload) => {
@@ -115,7 +49,7 @@ export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
           unpackedResult &&
           (unpackedResult.mapName || unpackedResult.archivePath)
         ) {
-          changeFormErrors(unpackedResult);
+          return unpackedResult;
         }
       } catch (err) {
         return false;
@@ -126,135 +60,132 @@ export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
     [dispatch]
   );
 
-  const handleSubmit = useCallback(
-    async (evt: FormEvent<HTMLFormElement>) => {
-      if (isFormSubmitting) {
-        return;
-      }
-      evt.preventDefault();
-
-      changeIsFormSubmitted(true);
-      changeisFormSubmitting(true);
-
-      const errors = validateFormData({
-        mapName: formValues.mapName.value,
-        archivePath: formValues.archivePath.value,
-      });
-
-      if (errors.mapName || errors.archivePath) {
-        changeFormErrors(errors);
-        changeisFormSubmitting(false);
-        return;
-      }
-
+  const handleFormMapSubmit = useCallback(
+    async (data: AnyObject) => {
       const result = await addMapSubmit({
-        mapName: formValues.mapName.value,
-        archivePath: formValues.archivePath.value,
+        mapName: data.mapName,
+        archivePath: data.archivePath,
       });
 
-      changeisFormSubmitting(false);
-      if (result) {
-        changeFormValues(initialFormValues);
-        changeIsFormSubmitted(false);
+      if (result === true) {
         handleClose();
+
+        return true;
       }
+
+      return result;
     },
-    [formValues, isFormSubmitting, handleClose, addMapSubmit]
+    [handleClose, addMapSubmit]
   );
-
-  const handleMapNameChange = useCallback(
-    (evt: ChangeEvent<HTMLInputElement>) => {
-      handleFormValueChange({
-        key: 'mapName',
-        data: {
-          value: evt.target.value,
-        },
-      });
-    },
-    [handleFormValueChange]
-  );
-
-  const handleChooseFileButtonClick = useCallback(async () => {
-    try {
-      const result = await remote.dialog.showOpenDialog({
-        properties: ['openFile'],
-        filters: [{ name: 'Archive', extensions: ['zip'] }],
-      });
-
-      if (result.canceled) {
-        return;
-      }
-      handleFormValueChange({
-        key: 'archivePath',
-        data: {
-          value: result.filePaths[0],
-        },
-      });
-      // eslint-disable-next-line no-empty
-    } catch (err) {}
-  }, [handleFormValueChange]);
 
   return (
-    <Modal isOpened={isOpened} handleClose={handleClose} background="#202020">
+    <Modal isOpened={isOpened} handleClose={handleClose} background="#393940">
       <Styled.Wrapper>
         <h2>{translate('NEW_MAP_FORM_TITLE')}</h2>
+        <Form
+          onSubmit={handleFormMapSubmit}
+          initialValues={{ archivePath: '', mapName: '' }}
+          validate={validateFormData}
+          render={({ handleSubmit, submitting }: FormRenderProps) => {
+            return (
+              <form onSubmit={handleSubmit}>
+                <Field name="mapName">
+                  {({
+                    input,
+                    meta,
+                  }: FieldRenderProps<string, HTMLInputElement>) => (
+                    <label htmlFor="input-mapName">
+                      <span>{translate('NEW_MAP_FORM_MAP_NAME_LABEL')}</span>
+                      {!!(meta.touched && (meta.error || meta.submitError)) && (
+                        <Styled.FormError
+                          isError={!!(meta.error || meta.submitError)}
+                        >
+                          {translate(meta.error || meta.submitError)}
+                        </Styled.FormError>
+                      )}
+                      <input
+                        id="input-mapName"
+                        type="text"
+                        placeholder={translate(
+                          'NEW_MAP_FORM_MAP_NAME_PLACEHOLDER'
+                        )}
+                        value={input.value}
+                        onChange={input.onChange}
+                      />
+                    </label>
+                  )}
+                </Field>
 
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="input-mapName">
-            <span>{translate('NEW_MAP_FORM_MAP_NAME_LABEL')}</span>
-            {(formValues.mapName.touched || isFormSubmitted) &&
-              formErrors.mapName && (
-                <Styled.FormError isError={!!formErrors.mapName}>
-                  {translate(formErrors.mapName)}
-                </Styled.FormError>
-              )}
-            <input
-              id="input-mapName"
-              type="text"
-              placeholder={translate('NEW_MAP_FORM_MAP_NAME_PLACEHOLDER')}
-              value={formValues.mapName.value}
-              onChange={handleMapNameChange}
-            />
-          </label>
+                <Field name="archivePath">
+                  {({
+                    input,
+                    meta,
+                  }: FieldRenderProps<string, HTMLInputElement>) => {
+                    const handlePreviewChange = async () => {
+                      try {
+                        const result = await remote.dialog.showOpenDialog({
+                          properties: ['openFile'],
+                          filters: [{ name: 'Archive', extensions: ['zip'] }],
+                        });
 
-          <label htmlFor="input-filePath">
-            <span>{translate('NEW_MAP_FORM_ARCHIVE_LABEL')}</span>
-            {(formValues.archivePath.touched || isFormSubmitted) &&
-              formErrors.archivePath && (
-                <Styled.FormError isError={!!formErrors.archivePath}>
-                  {translate(formErrors.archivePath)}
-                </Styled.FormError>
-              )}
+                        if (result.canceled) {
+                          return;
+                        }
 
-            <small style={{ margin: '0 0 1rem 0' }}>
-              {formValues.archivePath.value !== ''
-                ? formValues.archivePath.value
-                : 'Aucun chemin selectionné'}
-            </small>
+                        input.onChange(result.filePaths[0]);
 
-            <Styled.ChooseFileButton
-              onClick={handleChooseFileButtonClick}
-              type="button"
-            >
-              {translate('NEW_MAP_FORM_CHOOSE_FILE')}
-            </Styled.ChooseFileButton>
-            <input
-              id="input-filePath"
-              type="hidden"
-              value={formValues.archivePath.value}
-            />
-          </label>
+                        // eslint-disable-next-line no-empty
+                      } catch (err) {}
+                    };
+                    return (
+                      <label htmlFor="input-filePath">
+                        <span>{translate('NEW_MAP_FORM_ARCHIVE_LABEL')}</span>
+                        {!!(
+                          meta.touched &&
+                          (meta.error || meta.submitError)
+                        ) && (
+                          <Styled.FormError
+                            isError={!!(meta.error || meta.submitError)}
+                          >
+                            {translate(meta.error || meta.submitError)}
+                          </Styled.FormError>
+                        )}
 
-          <Styled.SubmitButton type="submit" disabled={isFormSubmitting}>
-            {isFormSubmitting ? (
-              <Styled.Loader>
-                <Loader color="orange" size="15" />
-              </Styled.Loader>
-            ) : (
-              <span>{translate('NEW_MAP_FORM_SUBMIT_BUTTON')}</span>
-            )}
-          </Styled.SubmitButton>
-        </form>
+                        <small style={{ margin: '0 0 1rem 0' }}>
+                          {input.value !== ''
+                            ? input.value
+                            : 'Aucun chemin selectionné'}
+                        </small>
+
+                        <Styled.ChooseFileButton
+                          onClick={handlePreviewChange}
+                          type="button"
+                        >
+                          {translate('NEW_MAP_FORM_CHOOSE_FILE')}
+                        </Styled.ChooseFileButton>
+                        <input
+                          id="input-filePath"
+                          type="hidden"
+                          value={input.value}
+                        />
+                      </label>
+                    );
+                  }}
+                </Field>
+
+                <Styled.SubmitButton type="submit" disabled={submitting}>
+                  {submitting ? (
+                    <Styled.Loader>
+                      <Loader color="orange" size="15px" />
+                    </Styled.Loader>
+                  ) : (
+                    <span>{translate('NEW_MAP_FORM_SUBMIT_BUTTON')}</span>
+                  )}
+                </Styled.SubmitButton>
+              </form>
+            );
+          }}
+        />
       </Styled.Wrapper>
     </Modal>
   );
