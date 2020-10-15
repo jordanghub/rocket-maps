@@ -154,7 +154,7 @@ export const AddMapFrom = ({ handleClose, isOpened }: IAddMapFormProps) => {
                         <small style={{ margin: '0 0 1rem 0' }}>
                           {input.value !== ''
                             ? input.value
-                            : 'Aucun chemin selectionné'}
+                            : translate('NEW_MAP_FORM_NO_PATH_SELECTED')}
                         </small>
 
                         <Styled.ChooseFileButton

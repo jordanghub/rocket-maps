@@ -6,6 +6,7 @@
   "MAP_CHANGE_STARTED": "Map change in progress",
   "MAP_CHANGE_ERROR": "The map change failed",
   "MAP_CHANGE_SUCCESS": "The map has been changed successfully",
+  "MAP_CHANGE_REPLACEMENT_MAP_DOESNT_EXISTS": "No file found in the game folder with this name",
   "MAP_PATH_LABEL": "Path to the maps folder",
   "GAME_PATH_LABEL": "Path to the game folder",
   "CHANGE_GAME_PATH_LABEL": "Change game path",
@@ -36,8 +37,7 @@
   "NEW_MAP_FORM_ERROR_ARCHIVE_DOESNT_EXIST": "The selected archive doesn't exit",
   "NEW_MAP_FORM_SUBMIT_SUCCESS": "Map added successfully",
   "NEW_MAP_FORM_SUBMIT_FAILED": "The map couldn't be added",
-
+  "NEW_MAP_FORM_NO_PATH_SELECTED": "No archive path",
   "DELETE_MAP_SUCCESS": "The map has been successfully deleted",
   "DELETE_MAP_FAILED": "The map couldn't be deleted"
-
 }

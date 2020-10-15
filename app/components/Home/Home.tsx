@@ -45,6 +45,8 @@ export const Home = memo(
 
     const { translate } = useTranslation();
 
+    console.log('loop home');
+
     const handleFilterMethodChange = useCallback(
       (name: IFilterMethodName) => {
         if (selectedFilterMethod.name === name) {
@@ -115,12 +117,15 @@ export const Home = memo(
         />
 
         <Styled.ActionsSidebar>
-          <button
-            type="button"
-            onClick={() => changeIsNewMapModalOpen({ status: true })}
-          >
-            {translate('NEW_MAP_FORM_TITLE')}
-          </button>
+          {mapFolder !== '' && (
+            <button
+              type="button"
+              onClick={() => changeIsNewMapModalOpen({ status: true })}
+              disabled={mapFolder === ''}
+            >
+              {translate('NEW_MAP_FORM_TITLE')}
+            </button>
+          )}
         </Styled.ActionsSidebar>
 
         {filteredMapList && (

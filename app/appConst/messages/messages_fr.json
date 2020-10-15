@@ -6,6 +6,7 @@
   "MAP_CHANGE_STARTED": "Changement de map en cours",
   "MAP_CHANGE_ERROR": "Le changement de map a échoué",
   "MAP_CHANGE_SUCCESS": "La map a été remplacée avec succès",
+  "MAP_CHANGE_REPLACEMENT_MAP_DOESNT_EXISTS": "La map à remplacer n'existe pas dans le dossier du jeu",
   "MAP_PATH_LABEL": "Chemin du dossier des maps",
   "GAME_PATH_LABEL": "Chemin du dossier du jeu",
   "CHANGE_GAME_PATH_LABEL": "Modifier le chemin vers le jeu",
@@ -31,8 +32,7 @@
   "NEW_MAP_FORM_ARCHIVE_LABEL": "Chemin de l'archive contenant la map (celle téléchargée sur le site au dessus)",
   "NEW_MAP_FORM_CHOOSE_FILE": "Choisir le fichier",
   "NEW_MAP_FORM_SUBMIT_BUTTON": "Ajouter",
-
-
+  "NEW_MAP_FORM_NO_PATH_SELECTED": "Aucun chemin selectionné",
   "NEW_MAP_FORM_ERROR_MAP_NAME_EMPTY": "Le nom de la map ne doit pas être vide",
   "NEW_MAP_FORM_ERROR_ARCHIVE_PATH_EMPTY": "Le chemin vers l'archive ne doit pas être vide",
   "NEW_MAP_FORM_ERROR_ARCHIVE_DOESNT_EXIST": "L'archive selectionnée n'existe pas",
@@ -41,4 +41,6 @@
 
   "DELETE_MAP_SUCCESS": "La map a été supprimée avec succès",
   "DELETE_MAP_FAILED": "La suppression de la map a échoué"
+  
+  
 }

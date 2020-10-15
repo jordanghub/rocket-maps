@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { getMessages } from 'appConst/messages/index';
 import { DEFAULT_MAP_REPLACEMENT_NAME } from 'appConst/path';
 import { changeSettingsKey } from '../../../utils/changeSettingsKey';
+
 import {
   IAppState,
   IChangeSearchValueAction,
@@ -95,6 +96,7 @@ const app = createSlice({
       if (!action.payload.init) {
         changeSettingsKey('replacementMapName', action.payload.name);
       }
+
       state.replacementMapName = action.payload.name;
     },
 

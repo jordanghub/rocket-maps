@@ -72,7 +72,9 @@ export default function HomePage() {
   ]);
 
   useEffect(() => {
-    initMapWatch();
+    if (mapFolder !== '') {
+      initMapWatch();
+    }
   }, [mapFolder, initMapWatch]);
 
   return (

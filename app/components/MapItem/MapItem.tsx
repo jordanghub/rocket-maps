@@ -1,4 +1,6 @@
 import Icon from 'components/Utils/Icon/Icon';
+import { KeyObject } from 'crypto';
+import { useOnClickOutside } from 'hooks/useClickOutside';
 import React, {
   ChangeEvent,
   memo,
@@ -58,11 +60,15 @@ export const MapItem = memo(
       []
     );
 
-    const handleMapNameInputBlur = () => {
+    const handleMapNameChange = useCallback(() => {
       if (name !== mapNameInputValue) {
         changeMapName({ mapId: id, newMapName: mapNameInputValue });
         changeMapNameInputValue(name);
       }
+    }, [changeMapName, id, mapNameInputValue, name]);
+
+    const handleMapNameInputBlur = () => {
+      handleMapNameChange();
       changeIsEditMode(false);
     };
 
@@ -70,6 +76,59 @@ export const MapItem = memo(
       changeMapNameInputValue(name);
     }, [name]);
     const ref = useRef<HTMLDivElement>(null);
+
+    /**
+     * Click en dehors de l'élément
+     */
+
+    const handleClickOut = useCallback(() => {
+      if (isEditMode) {
+        handleMapNameChange();
+        changeIsEditMode(false);
+      }
+    }, [handleMapNameChange, isEditMode]);
+
+    useOnClickOutside(ref, handleClickOut);
+
+    /**
+     * Double click sur le nom
+     */
+
+    const handleDoubleClick = useCallback(() => {
+      if (!isEditMode) {
+        changeIsEditMode(true);
+      }
+    }, [isEditMode]);
+
+    /**
+     * Appuie sur Escape ou Enter
+     */
+
+    const handleEditModeKeyboard = useCallback(
+      (evt: KeyboardEvent) => {
+        if (evt.code === 'Escape') {
+          changeIsEditMode(false);
+          changeMapNameInputValue(name);
+        } else if (evt.code === 'Enter') {
+          handleClickOut();
+        }
+      },
+      [handleClickOut, name]
+    );
+
+    /**
+     * Events clavier
+     */
+
+    useEffect(() => {
+      if (isEditMode) {
+        document.addEventListener('keydown', handleEditModeKeyboard);
+        return () =>
+          document.removeEventListener('keydown', handleEditModeKeyboard);
+      }
+
+      return undefined;
+    }, [isEditMode, handleEditModeKeyboard]);
 
     return (
       <Styled.AnimationWrapper
@@ -135,7 +194,7 @@ export const MapItem = memo(
                 />
               </span>
 
-              <span>{name}</span>
+              <span onDoubleClick={handleDoubleClick}>{name}</span>
             </h3>
           )}
 

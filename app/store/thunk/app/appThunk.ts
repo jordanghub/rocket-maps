@@ -107,10 +107,13 @@ export const selectMapAction = ({ name }: ISelectMapPayload) => async (
   dispatch: any,
   getState: () => IState
 ) => {
-  const { messages } = getState().app;
+  const {
+    messages,
+    replacementMapName,
+    rocketPath,
+    mapFolder,
+  } = getState().app;
   // Flash message pour annoncer que le changement de map a commencé
-
-  const { rocketPath, mapFolder } = getState().app;
 
   const gameMapsFolder = path.join(rocketPath, GAME_MAP_FOLDER);
   const selectedMapFolder = path.join(mapFolder, name);
@@ -134,6 +137,18 @@ export const selectMapAction = ({ name }: ISelectMapPayload) => async (
     return;
   }
 
+  // Vérifier que la map à remplacer existe dans le dossier du jeu
+  if (!fs.existsSync(path.join(gameMapsFolder, replacementMapName))) {
+    dispatch(
+      addFlashMessageAction({
+        message: messages.MAP_CHANGE_REPLACEMENT_MAP_DOESNT_EXISTS,
+        config: {
+          type: 'error',
+        },
+      })
+    );
+    return;
+  }
   if (
     !fs.existsSync(selectedMapFolder) ||
     !fs.lstatSync(selectedMapFolder).isDirectory()
@@ -177,7 +192,12 @@ export const selectMapAction = ({ name }: ISelectMapPayload) => async (
   try {
     fs.copyFileSync(
       path.join(mapFolder, name, file),
-      path.join(gameMapsFolder, DEFAULT_MAP_REPLACEMENT_NAME)
+      path.join(
+        gameMapsFolder,
+        replacementMapName !== ''
+          ? replacementMapName
+          : DEFAULT_MAP_REPLACEMENT_NAME
+      )
     );
     // La copie a réussi
     dispatch(

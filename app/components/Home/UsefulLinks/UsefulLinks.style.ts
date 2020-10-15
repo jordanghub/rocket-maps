@@ -21,3 +21,13 @@ export const Wrapper = styled.div`
     font-weight: bold;
   }
 `;
+
+export const WorkshopLinks = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export const HowItWorksContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
