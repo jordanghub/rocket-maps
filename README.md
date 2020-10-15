@@ -27,9 +27,9 @@ Paste the url in the text input and click on download
 
 Give a name to the map and select the file you just downloaded (the .zip file)
 ![Step Nine](captures/4.PNG)
-![Step Ten](captures/5.PNG)
+![Step Ten](captures/5.png)
 Now click on the play button
-![Step Eleven](captures/6.PNG)
+![Step Eleven](captures/6.png)
 
 If everything went well you can start RL and go to
 Training -> Freeplay and select the Pillar map
