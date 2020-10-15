@@ -2,7 +2,17 @@
 
 [Download link](dist-files/rocket-maps-dist.7z)
 
-First you need to download extract and start the app and then you can just follow the steps below
+Rocket maps is an app that helps you manage your custom map library from the steam workshop since there's no way (yet) to play on those maps from the epic games launcher
+
+Functionnalities :
+
+- Add a new map
+- Change the name of a map
+- Remove a map
+- Add / Remove favorite
+- Basic search and filter
+
+If you are ready to start you first need to download / extract the app and then you can just follow the steps below
 
 ![Step One](captures/1.PNG)
 
