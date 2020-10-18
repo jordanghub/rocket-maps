@@ -383,11 +383,27 @@ export const addNewMapAction = createAsyncThunk(
   ): Promise<IAddNewMapActionReturnType> => {
     const { mapFolder, messages } = (thunkApi.getState() as IState).app;
 
+    const forbiddenChar = [':', '\\', '/', '*', '?', '<', '>'];
+
+    let sanitisedMapName = mapName.trim();
+
+    forbiddenChar.forEach((char) => {
+      sanitisedMapName = sanitisedMapName.replaceAll(char, '');
+    });
+
+    // Le nom de la map n'est pas valide
+
+    if (sanitisedMapName === '') {
+      return {
+        mapName: MessagesLabelKey.NEW_MAP_FORM_MAP_NAME_INVALID,
+      };
+    }
+
     //  Pas de dossier contenant les maps
     if (mapFolder === '' || !fs.existsSync(mapFolder)) {
       return;
     }
-    if (fs.existsSync(path.join(mapFolder, mapName))) {
+    if (fs.existsSync(path.join(mapFolder, sanitisedMapName))) {
       // Une map existe déjà avec ce nom , cancel l'ajout
       return {
         mapName: MessagesLabelKey.MAP_ALREADY_EXISTS,
@@ -401,7 +417,7 @@ export const addNewMapAction = createAsyncThunk(
       };
     }
 
-    return extractZip(archivePath, path.join(mapFolder, mapName))
+    return extractZip(archivePath, path.join(mapFolder, sanitisedMapName))
       .then(() => {
         thunkApi.dispatch(
           addFlashMessageAction({

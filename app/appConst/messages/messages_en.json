@@ -38,6 +38,8 @@
   "NEW_MAP_FORM_SUBMIT_SUCCESS": "Map added successfully",
   "NEW_MAP_FORM_SUBMIT_FAILED": "The map couldn't be added",
   "NEW_MAP_FORM_NO_PATH_SELECTED": "No archive path",
+  "NEW_MAP_FORM_MAP_NAME_INVALID": "The map name is invalid",
+
   "DELETE_MAP_SUCCESS": "The map has been successfully deleted",
   "DELETE_MAP_FAILED": "The map couldn't be deleted"
 }

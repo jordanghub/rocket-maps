@@ -38,6 +38,7 @@
   "NEW_MAP_FORM_ERROR_ARCHIVE_DOESNT_EXIST": "L'archive selectionnée n'existe pas",
   "NEW_MAP_FORM_SUBMIT_SUCCESS": "La map a été ajoutée avec succès",
   "NEW_MAP_FORM_SUBMIT_FAILED": "Une erreur est survenue lors de l'ajout de la map",
+  "NEW_MAP_FORM_MAP_NAME_INVALID": "Le nom de la map n'est pas valide",
 
   "DELETE_MAP_SUCCESS": "La map a été supprimée avec succès",
   "DELETE_MAP_FAILED": "La suppression de la map a échoué"
