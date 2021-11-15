@@ -1,6 +1,6 @@
 # Rocket map selector
 
-[Download link](dist-files/rocket-maps-dist.7z)
+[Download link](https://www.file.io/download/7unnjFu3sU8P)
 
 Rocket maps is an app that helps you manage your custom map library from the steam workshop since there's no way (yet) to play on those maps from the epic games launcher
 
